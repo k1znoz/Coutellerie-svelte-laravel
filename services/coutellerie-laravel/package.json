@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "vite-plugin-devtools-json": "^1.0.0"
+  }
+}

@@ -1,0 +1,72 @@
+/* Styles pour l'animation marteau-enclume */
+
+/* Style pour le conteneur de l'animation */
+.animation-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    height: 50px;
+    position: relative;
+    transform-style: preserve-3d;
+    isolation: isolate;
+    contain: layout;
+}
+
+.strike {
+    animation: hammerStrike 1.8s ease-out 0s 1 normal forwards running;
+}
+
+@keyframes hammerStrike {
+    0% {
+        transform: rotate(35deg);
+    }
+
+    15% {
+        transform: rotate(45deg);
+    }
+
+    30% {
+        transform: rotate(-28deg);
+    }
+
+    33% {
+        transform: rotate(-32deg);
+    }
+
+    85% {
+        transform: rotate(10deg);
+    }
+
+    100% {
+        transform: rotate(30deg);
+    }
+}
+
+
+
+/* Effet de "secousse" pour l'enclume quand le marteau frappe */
+.hammer.strike+.anvil {
+    animation: anvilShake 0.45s ease-in-out 0.58s 1 normal forwards running;
+}
+
+
+@keyframes anvilShake {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(2px);
+    }
+
+    60% {
+        transform: translateY(-1px);
+    }
+
+    80% {
+        transform: translateY(1px);
+    }
+}
