@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Knife;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class KnifeController extends Controller
 {
@@ -22,14 +23,14 @@ class KnifeController extends Controller
         $mappedKnives = $knives->map(function ($knife) {
             $images = $knife->images ?: [];
             
-            // Ajouter le chemin complet pour les images
+          
             $fullPathImages = collect($images)->map(function ($image) {
-                return asset('storage/' . $image);
+                return url(Storage::url($image));
             })->toArray();
 
             return [
                 'id' => $knife->id,
-                'title' => $knife->name, // Mapper name vers title
+                'title' => $knife->name,
                 'category' => $knife->category,
                 'images' => $fullPathImages,
                 'description' => $knife->description,
@@ -79,10 +80,10 @@ class KnifeController extends Controller
             return response()->json(['error' => 'Couteau non trouvé'], 404);
         }
 
-        // Mapper les images avec le chemin complet
+       
         $images = $knife->images ?: [];
         $fullPathImages = collect($images)->map(function ($image) {
-            return asset('storage/' . $image);
+            return url(Storage::url($image)); 
         })->toArray();
 
         $mappedKnife = [
