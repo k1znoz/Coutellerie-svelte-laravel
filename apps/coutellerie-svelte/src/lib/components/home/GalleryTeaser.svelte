@@ -1,19 +1,46 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { selectRandomImages, type GalleryImage } from '$lib/utils/galleryUtils';
+	import { getAllKnives } from '$lib/services/api'; // Utiliser l'API Laravel
+	import type { Knife } from '$lib/types';
 
-	// Variable réactive pour les images sélectionnées
-	let featuredImages: GalleryImage[] = [];
+	let featuredImages: { src: string; alt: string; id: number }[] = [];
+	let loading = true;
 
-	// Sélectionner les images au montage du composant
-	onMount(() => {
-		featuredImages = selectRandomImages(3);
-	});
+	/**
+	 * Sélectionne 3 couteaux aléatoires depuis l'API
+	 */
+	async function loadFeaturedKnives() {
+		try {
+			const knives: Knife[] = await getAllKnives();
 
-	function navigateToGallery() {
+			if (knives.length === 0) return;
+
+			// Sélection aléatoire de 3 couteaux
+			const shuffled = [...knives].sort(() => Math.random() - 0.5);
+			const selectedKnives = shuffled.slice(0, 3);
+
+			// Mapper vers le format attendu
+			featuredImages = selectedKnives.map((knife) => ({
+				src: knife.images && knife.images.length > 0 ? knife.images[0] : '/images/placeholder.webp',
+				alt: `Création artisanale - ${knife.title}`,
+				id: knife.id
+			}));
+		} catch (error) {
+			console.error('Erreur lors du chargement des couteaux:', error);
+			featuredImages = []; // Fallback vers aucune image
+		} finally {
+			loading = false;
+		}
+	}
+
+	function handleImageClick(id: number) {
 		goto('/Gallery');
 	}
+
+	onMount(() => {
+		loadFeaturedKnives();
+	});
 </script>
 
 <section class="gallery-teaser">
@@ -23,22 +50,43 @@
 			<p>Découvrez quelques-unes de mes réalisations artisanales</p>
 		</div>
 
-		<div class="featured-grid">
-			{#each featuredImages as image}
-				<div
-					class="featured-item"
-					role="button"
-					tabindex="0"
-					on:click={navigateToGallery}
-					on:keydown={navigateToGallery}
-				>
-					<img src={image.src} alt={image.alt} loading="lazy" />
-				</div>
-			{/each}
-		</div>
+		{#if loading}
+			<div class="loading">
+				<p>Chargement des créations...</p>
+			</div>
+		{:else if featuredImages.length === 0}
+			<div class="no-images">
+				<p>Aucune création disponible pour le moment.</p>
+			</div>
+		{:else}
+			<div class="featured-grid">
+				{#each featuredImages as image, index}
+					<div
+						class="featured-item"
+						role="button"
+						tabindex="0"
+						on:click={() => handleImageClick(image.id)}
+						on:keydown={(e) => e.key === 'Enter' && handleImageClick(image.id)}
+					>
+						<img
+							src={image.src}
+							alt={image.alt}
+							loading="lazy"
+							on:error={(e) => {
+								// Correction TypeScript : typage explicite
+								const target = e.target as HTMLImageElement;
+								if (target) {
+									target.src = '/images/placeholder.webp';
+								}
+							}}
+						/>
+					</div>
+				{/each}
+			</div>
+		{/if}
 
 		<div class="cta-section">
-			<button class="cta-button" on:click={navigateToGallery}>
+			<button class="cta-button" on:click={() => goto('/Gallery')}>
 				<i class="fas fa-images"></i>
 				Découvrir toute la galerie
 			</button>
@@ -73,6 +121,12 @@
 		color: var(--grey, #666);
 		max-width: 600px;
 		margin: 0 auto;
+	}
+
+	.loading,
+	.no-images {
+		padding: 2rem;
+		color: var(--text-muted, #666);
 	}
 
 	.featured-grid {
