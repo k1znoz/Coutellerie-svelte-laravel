@@ -1,1 +1,1 @@
-web: cd services/coutellerie-laravel && composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip && php artisan key:generate --force && php artisan migrate --force && php artisan config:cache && php artisan serve --host=0.0.0.0 --port=$PORT
+web: bash deploy.sh
