@@ -10,7 +10,7 @@ export DEBIAN_FRONTEND=noninteractive
 # First update package list and install required system packages
 echo "📦 Installing system dependencies..."
 apt-get update -qq
-apt-get install -y -qq libicu-dev libzip-dev libxml2-dev libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev default-mysql-client libonig-dev 2>/dev/null || echo "⚠️ Some system packages may already be installed"
+apt-get install -y -qq libicu-dev libzip-dev libxml2-dev libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev default-mysql-client libonig-dev gettext-base 2>/dev/null || echo "⚠️ Some system packages may already be installed"
 
 # Clean any existing extension compilation artifacts
 rm -rf /usr/src/php/ext/*/tmp-php* 2>/dev/null || true
@@ -49,16 +49,15 @@ php -m | grep -E "(pdo|mysql|intl|zip|xml|gd|mbstring)" | head -10
 echo "📦 Installing Composer dependencies..."
 composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip --ignore-platform-req=ext-pdo_mysql || exit 1
 
-# Create .env from .env.production
-echo "📄 Creating .env file..."
+# Create .env from .env.production with environment variable substitution
+echo "📄 Creating .env file with environment variables..."
 if [ -f .env.production ]; then
-    cp .env.production .env || exit 1
-    echo "✅ .env file created from .env.production"
+    # Use envsubst to substitute environment variables, but preserve Laravel's ${} syntax for non-Railway vars
+    envsubst '$MYSQL_HOST $MYSQL_PORT $MYSQL_DATABASE $MYSQL_USER $MYSQL_PASSWORD $DATABASE_URL' < .env.production > .env || exit 1
+    echo "✅ .env file created from .env.production with variable substitution"
 else
-    echo "⚠️ .env.production not found, checking if .env already exists..."
-    if [ ! -f .env ]; then
-        echo "❌ No .env or .env.production found, creating minimal .env..."
-        cat > .env << EOF
+    echo "⚠️ .env.production not found, creating .env with Railway MySQL variables..."
+    cat > .env << EOF
 APP_NAME="Coutellerie Svelte Laravel"
 APP_ENV=production
 APP_KEY=
@@ -66,19 +65,27 @@ APP_DEBUG=false
 APP_URL=
 
 DB_CONNECTION=mysql
-DB_HOST=\${MYSQL_HOST}
-DB_PORT=\${MYSQL_PORT}
-DB_DATABASE=\${MYSQL_DATABASE}
-DB_USERNAME=\${MYSQL_USER}
-DB_PASSWORD=\${MYSQL_PASSWORD}
+DB_HOST=${MYSQL_HOST}
+DB_PORT=${MYSQL_PORT}
+DB_DATABASE=${MYSQL_DATABASE}
+DB_USERNAME=${MYSQL_USER}
+DB_PASSWORD=${MYSQL_PASSWORD}
 
 SESSION_DRIVER=database
 CACHE_STORE=database
 QUEUE_CONNECTION=database
 LOG_CHANNEL=stderr
+LOG_LEVEL=info
 EOF
-    fi
 fi
+
+# Show database configuration for debugging (without passwords)
+echo "🔍 Database configuration:"
+echo "DB_HOST: ${MYSQL_HOST:-'NOT_SET'}"
+echo "DB_PORT: ${MYSQL_PORT:-'NOT_SET'}"  
+echo "DB_DATABASE: ${MYSQL_DATABASE:-'NOT_SET'}"
+echo "DB_USERNAME: ${MYSQL_USER:-'NOT_SET'}"
+echo "DATABASE_URL: ${DATABASE_URL:0:20}..." # Show first 20 chars only
 
 # Generate APP_KEY if not set
 if [ -z "$APP_KEY" ]; then
