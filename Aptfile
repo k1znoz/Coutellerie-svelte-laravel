@@ -1,5 +1,6 @@
 php-mysql
 php8.3-mysql
+php8.3-pdo-mysql
 php8.3-intl
 php8.3-zip
 php8.3-xml

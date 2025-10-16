@@ -14,8 +14,11 @@ apt-get install -y \
     php8.3-curl \
     php8.3-mbstring \
     php8.3-gd \
-    php8.3-mysql
+    php8.3-mysql \
+    php8.3-pdo-mysql
 
 echo "✅ Extensions PHP installées"
 echo "🔍 Vérification des extensions:"
-php -m | grep -E "(intl|zip|xml|curl|mbstring|gd|mysql)"
+php -m | grep -E "(intl|zip|xml|curl|mbstring|gd|mysql|pdo_mysql)"
+echo "🔍 Vérification spécifique PDO:"
+php -r "echo 'PDO MySQL: ' . (extension_loaded('pdo_mysql') ? 'OK' : 'MISSING') . PHP_EOL;"
