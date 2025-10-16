@@ -69,6 +69,7 @@ APP_DEBUG=false
 APP_URL=
 
 DATABASE_URL=${DATABASE_URL}
+DB_URL=${DATABASE_URL}
 
 SESSION_DRIVER=database
 CACHE_STORE=database
@@ -87,7 +88,26 @@ echo "DATABASE_URL: ${DATABASE_URL:0:50}..." # Show first 50 chars only
 
 # Debug: Show what's actually in the .env file after substitution
 echo "🔍 Generated .env file (database section):"
-grep -E "^DB_" .env || echo "No DB_ variables found in .env"
+grep -E "^(DB_|DATABASE_)" .env || echo "No database variables found in .env"
+
+# Debug: Test Laravel database configuration parsing
+echo "🔍 Laravel database configuration:"
+php artisan tinker --execute="
+echo 'Database config:' . PHP_EOL;
+\$config = config('database.connections.mysql');
+if (is_null(\$config)) {
+    echo 'MySQL config is null, checking default connection...' . PHP_EOL;
+    \$config = config('database.connections.' . config('database.default'));
+}
+if (\$config) {
+    echo 'Host: ' . (\$config['host'] ?? 'NOT_SET') . PHP_EOL;
+    echo 'Port: ' . (\$config['port'] ?? 'NOT_SET') . PHP_EOL;
+    echo 'Database: ' . (\$config['database'] ?? 'NOT_SET') . PHP_EOL;
+    echo 'Username: ' . (\$config['username'] ?? 'NOT_SET') . PHP_EOL;
+} else {
+    echo 'No database config found!' . PHP_EOL;
+}
+" || echo "⚠️ Failed to read Laravel database config"
 
 # Generate APP_KEY if not set
 if [ -z "$APP_KEY" ]; then
