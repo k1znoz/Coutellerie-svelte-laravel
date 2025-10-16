@@ -3,10 +3,5 @@
     "type": "project",
     "require": {
         "php": "^8.2"
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "cd services/coutellerie-laravel && composer install --no-dev --optimize-autoloader"
-        ]
     }
 }
