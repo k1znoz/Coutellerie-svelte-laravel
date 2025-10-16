@@ -3,11 +3,29 @@
 # Railway deployment script for Laravel
 echo "🚀 Starting Railway deployment..."
 
-# Install PHP extensions first (in case Aptfile didn't work)
-echo "🔧 Installing PHP extensions via apt..."
+# Install PHP extensions using Docker PHP extension installer
+echo "🔧 Installing PHP extensions via docker-php-ext-install..."
 export DEBIAN_FRONTEND=noninteractive
+
+# First update package list and install required system packages
 apt-get update -qq
-apt-get install -y -qq php8.3-pdo-mysql php8.3-mysql php8.3-mysqli php8.3-intl php8.3-zip php8.3-xml php8.3-curl php8.3-mbstring php8.3-gd
+apt-get install -y -qq libicu-dev libzip-dev libxml2-dev libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev default-mysql-client libonig-dev
+
+# Install PHP extensions using docker-php-ext-install
+docker-php-ext-install -j$(nproc) \
+    intl \
+    zip \
+    xml \
+    curl \
+    mbstring \
+    gd \
+    pdo \
+    pdo_mysql \
+    mysqli
+
+# Configure GD extension with freetype and jpeg support
+docker-php-ext-configure gd --with-freetype --with-jpeg
+docker-php-ext-install -j$(nproc) gd
 
 # Change to Laravel directory
 cd services/coutellerie-laravel || exit 1
@@ -20,7 +38,7 @@ php -r "echo 'MySQLi: ' . (extension_loaded('mysqli') ? '✅ OK' : '❌ MISSING'
 
 # Install Composer dependencies
 echo "📦 Installing Composer dependencies..."
-composer install --no-dev --optimize-autoloader || exit 1
+composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip --ignore-platform-req=ext-pdo_mysql || exit 1
 
 # Create .env from .env.production
 echo "📄 Creating .env file..."
