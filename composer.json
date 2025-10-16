@@ -1,0 +1,23 @@
+{
+    "name": "coutellerie/svelte-laravel-app",
+    "type": "project",
+    "description": "Coutellerie Svelte + Laravel Application",
+    "require": {
+        "php": "^8.3"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "cd services/coutellerie-laravel && composer install --no-dev --optimize-autoloader"
+        ],
+        "post-update-cmd": [
+            "cd services/coutellerie-laravel && composer install --no-dev --optimize-autoloader"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
