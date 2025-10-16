@@ -31,11 +31,18 @@ COPY . .
 # Build Svelte
 RUN cd apps/coutellerie-svelte && npm ci && npx svelte-kit sync && npm run build
 
+# Copier build Svelte vers Laravel public
+RUN mkdir -p services/coutellerie-laravel/public/build && \
+    cp -r apps/coutellerie-svelte/build/* services/coutellerie-laravel/public/build/ 2>/dev/null || true
+
 # Installer dépendances Laravel
 RUN cd services/coutellerie-laravel && composer install --no-dev --optimize-autoloader --no-interaction
 
 # Exposer le port
 EXPOSE 8000
 
+# Définir le répertoire de travail Laravel
+WORKDIR /app/services/coutellerie-laravel
+
 # Commande de démarrage
-CMD ["sh", "-c", "cd services/coutellerie-laravel && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"]
+CMD php artisan migrate --force --no-interaction && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
