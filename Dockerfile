@@ -4,9 +4,10 @@ FROM node:18-alpine as frontend-builder
 # Copier et construire l'application Svelte
 WORKDIR /app/frontend
 COPY apps/coutellerie-svelte/package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 COPY apps/coutellerie-svelte/ ./
+RUN npx svelte-kit sync
 RUN npm run build
 
 # Stage principal PHP/Laravel

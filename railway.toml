@@ -2,9 +2,10 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "cd services/coutellerie-laravel && php artisan serve --host=0.0.0.0 --port=$PORT"
+startCommand = "./start.sh"
 restartPolicyType = "always"
 
 [variables]
 NODE_VERSION = "18"
 PHP_VERSION = "8.2"
+NIXPACKS_NO_DOCKERFILE = "true"
