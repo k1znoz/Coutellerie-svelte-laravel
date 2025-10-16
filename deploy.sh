@@ -12,7 +12,34 @@ composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-intl -
 
 # Create .env from .env.production
 echo "📄 Creating .env file..."
-cp .env.production .env || exit 1
+if [ -f .env.production ]; then
+    cp .env.production .env || exit 1
+    echo "✅ .env file created from .env.production"
+else
+    echo "⚠️ .env.production not found, checking if .env already exists..."
+    if [ ! -f .env ]; then
+        echo "❌ No .env or .env.production found, creating minimal .env..."
+        cat > .env << EOF
+APP_NAME="Coutellerie Svelte Laravel"
+APP_ENV=production
+APP_KEY=
+APP_DEBUG=false
+APP_URL=
+
+DB_CONNECTION=mysql
+DB_HOST=\${MYSQL_HOST}
+DB_PORT=\${MYSQL_PORT}
+DB_DATABASE=\${MYSQL_DATABASE}
+DB_USERNAME=\${MYSQL_USER}
+DB_PASSWORD=\${MYSQL_PASSWORD}
+
+SESSION_DRIVER=database
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+LOG_CHANNEL=stderr
+EOF
+    fi
+fi
 
 # Generate APP_KEY if not set
 if [ -z "$APP_KEY" ]; then
