@@ -1,162 +1,146 @@
 #!/bin/bash
-# deploy.sh - Script de déploiement monorepo
+
+# Script de démarrage simplifié pour Railway
+echo "🚀 Démarrage de l'application Coutellerie..."
+
 # Variables d'environnement
 FRONTEND_DIR="apps/coutellerie-svelte"
 BACKEND_DIR="services/coutellerie-laravel"
-SERVER="user@serveur.com"
-REMOTE_FRONTEND="/var/www/frontend"
-REMOTE_BACKEND="/var/www/backend"
-BACKUP_DIR="/var/backups/$(date +%Y%m%d_%H%M%S)"
 
-echo "🚀 Début du déploiement monorepo..."
-
-# Vérification des prérequis
+# Fonction de vérification des prérequis
 check_prerequisites() {
     echo "🔍 Vérification des prérequis..."
     
     # Vérifier Node.js et npm
-    if ! command -v npm &> /dev/null; then
+    if ! command -v npm >/dev/null 2>&1; then
         echo "❌ npm non trouvé"
-        exit 1
+        return 1
     fi
     
     # Vérifier Composer
-    if ! command -v composer &> /dev/null; then
+    if ! command -v composer >/dev/null 2>&1; then
         echo "❌ Composer non trouvé"
-        exit 1
+        return 1
     fi
     
     echo "✅ Prérequis validés"
+    return 0
 }
 
 # Build du frontend SvelteKit
 build_frontend() {
     echo "🏗️ Build du frontend SvelteKit..."
-    cd $FRONTEND_DIR
+    cd "$FRONTEND_DIR" || return 1
     
     # Installation des dépendances
-    npm ci --production=false
-    if [ $? -ne 0 ]; then
+    echo "📦 Installation des dépendances npm..."
+    npm ci --production=false || {
         echo "❌ Erreur installation npm"
-        exit 1
-    fi
+        return 1
+    }
     
     # Build optimisé
-    npm run build
-    if [ $? -ne 0 ]; then
+    echo "🔨 Construction du build SvelteKit..."
+    npm run build || {
         echo "❌ Erreur lors du build SvelteKit"
-        exit 1
-    fi
+        return 1
+    }
     
     echo "✅ Build SvelteKit terminé"
-    cd ../..
+    cd - >/dev/null || return 1
+    return 0
 }
 
 # Préparation du backend Laravel
 prepare_backend() {
     echo "📦 Préparation du backend Laravel..."
-    cd $BACKEND_DIR
+    cd "$BACKEND_DIR" || return 1
     
     # Installation des dépendances production
-    composer install --no-dev --optimize-autoloader
-    if [ $? -ne 0 ]; then
+    echo "📥 Installation des dépendances Composer..."
+    composer install --no-dev --optimize-autoloader --ignore-platform-reqs || {
         echo "❌ Erreur installation Composer"
-        exit 1
+        return 1
+    }
+    
+    # Vérifier si .env existe, sinon créer depuis .env.production
+    if [ ! -f .env ] && [ -f .env.production ]; then
+        echo "📄 Copie de .env.production vers .env..."
+        cp .env.production .env
     fi
+    
+    # Générer la clé d'application si nécessaire
+    if ! php artisan config:show app.key >/dev/null 2>&1; then
+        echo "🔑 Génération de la clé d'application..."
+        php artisan key:generate --force
+    fi
+    
+    # Migrations de base de données
+    echo "🗄️ Exécution des migrations..."
+    php artisan migrate --force || echo "⚠️ Migrations échouées, continuons..."
     
     # Optimisations Laravel
-    php artisan config:cache
-    php artisan route:cache
-    php artisan view:cache
+    echo "⚡ Optimisations Laravel..."
+    php artisan config:cache || echo "⚠️ Config cache échoué"
+    php artisan route:cache || echo "⚠️ Route cache échoué"
+    php artisan view:cache || echo "⚠️ View cache échoué"
     
     echo "✅ Backend Laravel préparé"
-    cd ../..
+    cd - >/dev/null || return 1
+    return 0
 }
 
-# Sauvegarde et déploiement
-deploy_applications() {
-    echo "📡 Déploiement vers le serveur..."
+# Démarrage de l'application
+start_application() {
+    echo "� Démarrage du serveur Laravel..."
+    cd "$BACKEND_DIR" || return 1
     
-    # Création de sauvegarde
-    ssh $SERVER "mkdir -p $BACKUP_DIR"
-    ssh $SERVER "cp -r $REMOTE_FRONTEND $BACKUP_DIR/frontend_backup"
-    ssh $SERVER "cp -r $REMOTE_BACKEND $BACKUP_DIR/backend_backup"
+    # Vérification de l'environnement
+    echo "🌍 Environnement: $(php artisan env 2>/dev/null || echo 'inconnu')"
     
-    # Upload frontend SvelteKit
-    echo "📤 Upload frontend..."
-    rsync -avz --delete --exclude=node_modules \
-        $FRONTEND_DIR/build/ $SERVER:$REMOTE_FRONTEND/
-    rsync -avz $FRONTEND_DIR/static/ $SERVER:$REMOTE_FRONTEND/static/
-    
-    # Upload backend Laravel
-    echo "📤 Upload backend..."
-    rsync -avz --delete \
-        --exclude=node_modules \
-        --exclude=.env \
-        --exclude=storage/logs \
-        --exclude=storage/framework/cache \
-        $BACKEND_DIR/ $SERVER:$REMOTE_BACKEND/
-    
-    # Configuration post-déploiement Laravel
-    ssh $SERVER "cd $REMOTE_BACKEND && php artisan migrate --force"
-    ssh $SERVER "cd $REMOTE_BACKEND && php artisan storage:link"
-    ssh $SERVER "chmod -R 755 $REMOTE_BACKEND/storage"
-    ssh $SERVER "chmod -R 755 $REMOTE_BACKEND/bootstrap/cache"
+    # Démarrage du serveur Laravel
+    echo "🌟 Serveur Laravel en cours de démarrage sur le port $PORT..."
+    php artisan serve --host=0.0.0.0 --port="${PORT:-8000}" || {
+        echo "❌ Impossible de démarrer le serveur Laravel"
+        return 1
+    }
 }
 
-# Vérification post-déploiement
-verify_deployment() {
-    echo "🔍 Vérification du déploiement..."
-    
-    # Test frontend
-    FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://coutellerie-artisanale.com)
-    if [ "$FRONTEND_STATUS" != "200" ]; then
-        echo "❌ Frontend inaccessible (HTTP $FRONTEND_STATUS)"
-        rollback_deployment
-        exit 1
-    fi
-    
-    # Test API Laravel
-    API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://coutellerie-artisanale.com/api/health)
-    if [ "$API_STATUS" != "200" ]; then
-        echo "❌ API inaccessible (HTTP $API_STATUS)"
-        rollback_deployment
-        exit 1
-    fi
-    
-    echo "✅ Déploiement vérifié avec succès"
-}
-
-# Rollback en cas d'erreur
-rollback_deployment() {
-    echo "🔄 Rollback en cours..."
-    ssh $SERVER "cp -r $BACKUP_DIR/frontend_backup/* $REMOTE_FRONTEND/"
-    ssh $SERVER "cp -r $BACKUP_DIR/backend_backup/* $REMOTE_BACKEND/"
-    ssh $SERVER "cd $REMOTE_BACKEND && php artisan config:cache"
-    echo "✅ Rollback terminé"
-}
-
-# Nettoyage
+# Fonction de nettoyage (optionnelle)
 cleanup() {
-    echo "🧹 Nettoyage..."
-    ssh $SERVER "find /var/backups -type d -mtime +7 -exec rm -rf {} \;"
+    echo "🧹 Nettoyage des fichiers temporaires..."
+    # Nettoyer les caches Laravel si nécessaire
+    cd "$BACKEND_DIR" 2>/dev/null && {
+        php artisan cache:clear 2>/dev/null || true
+        php artisan config:clear 2>/dev/null || true
+    }
     echo "✅ Nettoyage terminé"
 }
 
-# Exécution du script
+# Fonction principale
 main() {
-    check_prerequisites
-    build_frontend
-    prepare_backend
-    deploy_applications
-    verify_deployment
-    cleanup
-    echo "🎉 Déploiement monorepo terminé avec succès !"
+    echo "🎯 Démarrage de l'application Coutellerie Laravel..."
+    
+    # Vérification des prérequis
+    if ! check_prerequisites; then
+        echo "❌ Échec de la vérification des prérequis"
+        exit 1
+    fi
+    
+    # Préparation du backend (priorité pour Railway)
+    if ! prepare_backend; then
+        echo "❌ Échec de la préparation du backend"
+        exit 1
+    fi
+    
+    # Démarrage de l'application
+    if ! start_application; then
+        echo "❌ Échec du démarrage de l'application"
+        exit 1
+    fi
+    
+    echo "🎉 Application démarrée avec succès !"
 }
 
-# Gestion des erreurs
-set -e
-trap 'echo "❌ Erreur détectée, rollback automatique" && rollback_deployment' ERR
-
-# Lancement
-main
+# Point d'entrée du script
+main "$@"
