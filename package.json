@@ -3,8 +3,7 @@
     "private": true,
     "version": "1.0.0",
     "scripts": {
-        "build": "bash build.sh",
-        "start": "bash start.sh"
+        "build": "bash build.sh"
     },
     "engines": {
         "node": "18.x"
