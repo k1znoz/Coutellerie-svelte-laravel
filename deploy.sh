@@ -55,12 +55,12 @@ if [ -f .env.production ]; then
     echo "🔍 Before substitution - checking .env.production database section:"
     grep -E "^DB_" .env.production || echo "No DB_ variables found in .env.production"
     
-    # Use envsubst to substitute Railway MySQL variables
-    echo "🔄 Running envsubst with Railway MySQL variables..."
-    envsubst '$MYSQL_PUBLIC_URL $MYSQLHOST $MYSQLPORT $MYSQLDATABASE $MYSQLUSER $MYSQLPASSWORD' < .env.production > .env || exit 1
+    # Use envsubst to substitute only MYSQL_PUBLIC_URL (most reliable)
+    echo "🔄 Running envsubst with MYSQL_PUBLIC_URL only..."
+    envsubst '$MYSQL_PUBLIC_URL' < .env.production > .env || exit 1
     echo "✅ .env file created from .env.production with variable substitution"
 else
-    echo "⚠️ .env.production not found, creating .env with Railway MySQL variables..."
+    echo "⚠️ .env.production not found, creating .env with MYSQL_PUBLIC_URL..."
     cat > .env << EOF
 APP_NAME="Coutellerie Svelte Laravel"
 APP_ENV=production
@@ -69,12 +69,6 @@ APP_DEBUG=false
 APP_URL=
 
 DB_URL=${MYSQL_PUBLIC_URL}
-DB_CONNECTION=mysql
-DB_HOST=${MYSQLHOST}
-DB_PORT=${MYSQLPORT}
-DB_DATABASE=${MYSQLDATABASE}
-DB_USERNAME=${MYSQLUSER}
-DB_PASSWORD=${MYSQLPASSWORD}
 
 SESSION_DRIVER=database
 CACHE_STORE=database
@@ -88,23 +82,28 @@ fi
 echo "🔍 Railway environment:"
 echo "MYSQL_PUBLIC_URL available: ${MYSQL_PUBLIC_URL:+YES}"
 echo "MYSQL_URL available: ${MYSQL_URL:+YES}"
+
+# Test different possible variable names
+echo "🔍 Testing variable name variations:"
+echo "MYSQLHOST: ${MYSQLHOST:-'NOT_SET'}"
+echo "MYSQL_HOST: ${MYSQL_HOST:-'NOT_SET'}"
+echo "MYSQLPORT: ${MYSQLPORT:-'NOT_SET'}"
+echo "MYSQL_PORT: ${MYSQL_PORT:-'NOT_SET'}"
+echo "MYSQLDATABASE: ${MYSQLDATABASE:-'NOT_SET'}"
+echo "MYSQL_DATABASE: ${MYSQL_DATABASE:-'NOT_SET'}"
+echo "MYSQLUSER: ${MYSQLUSER:-'NOT_SET'}"
+echo "MYSQL_USER: ${MYSQL_USER:-'NOT_SET'}"
 echo "RAILWAY_ENVIRONMENT: ${RAILWAY_ENVIRONMENT:-'NOT_SET'}"
 echo "RAILWAY_PROJECT_NAME: ${RAILWAY_PROJECT_NAME:-'NOT_SET'}"
 echo "RAILWAY_SERVICE_NAME: ${RAILWAY_SERVICE_NAME:-'NOT_SET'}"
 
 # Check for private network variables
-echo "🔍 Checking for Railway private network variables:"
-env | grep -E "(MYSQL_|DATABASE_)" | while read var; do
-    echo "  $var"
-done
+echo "🔍 ALL Railway MySQL variables found:"
+env | grep -i mysql | sort
 
 # Show database configuration for debugging
 echo "🔍 Database configuration:"
 echo "MYSQL_PUBLIC_URL: ${MYSQL_PUBLIC_URL:0:50}..." # Show first 50 chars only
-echo "MYSQLHOST: ${MYSQLHOST:-'NOT_SET'}"
-echo "MYSQLPORT: ${MYSQLPORT:-'NOT_SET'}"
-echo "MYSQLDATABASE: ${MYSQLDATABASE:-'NOT_SET'}"
-echo "MYSQLUSER: ${MYSQLUSER:-'NOT_SET'}"
 
 # Debug: Show what's actually in the .env file after substitution
 echo "🔍 Generated .env file (database section):"
@@ -150,16 +149,20 @@ php artisan migrate --force || {
 
 # Test network connectivity to MySQL host first
 echo "🌐 Testing network connectivity to MySQL..."
-if [ -n "$MYSQLHOST" ]; then
-    echo "Using Railway variables - host: $MYSQLHOST, port: $MYSQLPORT"
+if [ -n "$MYSQL_PUBLIC_URL" ]; then
+    echo "Using MYSQL_PUBLIC_URL: ${MYSQL_PUBLIC_URL:0:50}..."
+    # Extract host and port from MYSQL_PUBLIC_URL
+    MYSQL_HOST_EXTRACTED=$(echo "$MYSQL_PUBLIC_URL" | sed -n 's/.*@\([^:]*\):.*/\1/p')
+    MYSQL_PORT_EXTRACTED=$(echo "$MYSQL_PUBLIC_URL" | sed -n 's/.*:\([0-9]*\)\/.*/\1/p')
+    echo "Extracted host: $MYSQL_HOST_EXTRACTED, port: $MYSQL_PORT_EXTRACTED"
     
     # Test if we can reach the MySQL host
-    timeout 10 bash -c "echo >/dev/tcp/$MYSQLHOST/$MYSQLPORT" && echo "✅ Network connectivity OK" || echo "❌ Cannot reach MySQL host"
+    timeout 10 bash -c "echo >/dev/tcp/$MYSQL_HOST_EXTRACTED/$MYSQL_PORT_EXTRACTED" && echo "✅ Network connectivity OK" || echo "❌ Cannot reach MySQL host"
     
     # Test with mysql client if available
     if command -v mysql >/dev/null 2>&1; then
-        echo "🔧 Testing MySQL client connection..."
-        timeout 10 mysql --host="$MYSQLHOST" --port="$MYSQLPORT" --user="$MYSQLUSER" --password="$MYSQLPASSWORD" --database="$MYSQLDATABASE" --connect-timeout=5 --execute="SELECT 1;" && echo "✅ MySQL client connection OK" || echo "⚠️ MySQL client connection failed"
+        echo "🔧 Testing MySQL client connection with URL..."
+        timeout 10 mysql "$MYSQL_PUBLIC_URL" --connect-timeout=5 --execute="SELECT 1;" && echo "✅ MySQL client connection OK" || echo "⚠️ MySQL client connection failed"
     fi
 fi
 
