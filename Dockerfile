@@ -8,8 +8,19 @@ RUN apt-get install -y nodejs
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Installer les dépendances système pour les extensions PHP
+RUN apt-get update && apt-get install -y \
+    libicu-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
 # Installer extensions PHP nécessaires
-RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install \
+    pdo_mysql \
+    intl \
+    zip
 
 # Définir le répertoire de travail
 WORKDIR /app
