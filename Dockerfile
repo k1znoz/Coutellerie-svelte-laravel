@@ -1,4 +1,4 @@
-# Dockerfile simple pour Railway
+# Dockerfile pour Railway - Fixed CMD issue
 FROM php:8.3-cli
 
 # Installer Node.js
@@ -41,8 +41,11 @@ RUN cd services/coutellerie-laravel && composer install --no-dev --optimize-auto
 # Exposer le port
 EXPOSE 8000
 
+# Rendre le script de démarrage exécutable
+RUN chmod +x start-laravel.sh
+
 # Définir le répertoire de travail Laravel
 WORKDIR /app/services/coutellerie-laravel
 
 # Commande de démarrage
-CMD php artisan migrate --force --no-interaction && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+CMD ["/app/start-laravel.sh"]
