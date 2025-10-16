@@ -8,7 +8,7 @@ cd services/coutellerie-laravel
 
 # Always ensure Laravel dependencies are installed
 echo "📦 Installing/verifying Laravel dependencies..."
-composer install --no-dev --optimize-autoloader --no-interaction
+composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
 
 # Verify that vendor/autoload.php exists
 if [ ! -f "vendor/autoload.php" ]; then

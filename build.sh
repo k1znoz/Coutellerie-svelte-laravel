@@ -21,7 +21,7 @@ echo "🔍 Checking for PHP/Composer availability..."
 if command -v composer >/dev/null 2>&1; then
     echo "📦 Installing PHP dependencies..."
     cd services/coutellerie-laravel
-    composer install --no-dev --optimize-autoloader --no-interaction
+    composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
     cd ../..
     echo "✅ PHP dependencies installed!"
 else

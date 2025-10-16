@@ -12,7 +12,7 @@ if (!file_exists($vendorAutoload)) {
         $composerCheck = shell_exec('which composer 2>/dev/null');
         if ($composerCheck) {
             echo "Installing Laravel dependencies...\n";
-            shell_exec('composer install --no-dev --optimize-autoloader --no-interaction 2>&1');
+            shell_exec('composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs 2>&1');
         }
     }
 }
