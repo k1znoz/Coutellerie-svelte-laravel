@@ -1,5 +1,5 @@
 # Dockerfile simple pour Railway
-FROM php:8.2-cli
+FROM php:8.3-cli
 
 # Installer Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
