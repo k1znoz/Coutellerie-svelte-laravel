@@ -11,9 +11,9 @@ BACKEND_DIR="services/coutellerie-laravel"
 check_prerequisites() {
     echo "🔍 Vérification des prérequis..."
     
-    # Vérifier Node.js et npm
-    if ! command -v npm >/dev/null 2>&1; then
-        echo "❌ npm non trouvé"
+    # Vérifier PHP
+    if ! command -v php >/dev/null 2>&1; then
+        echo "❌ PHP non trouvé"
         return 1
     fi
     
@@ -23,33 +23,12 @@ check_prerequisites() {
         return 1
     fi
     
-    echo "✅ Prérequis validés"
+    echo "✅ Prérequis validés (PHP + Composer)"
     return 0
 }
 
-# Build du frontend SvelteKit
-build_frontend() {
-    echo "🏗️ Build du frontend SvelteKit..."
-    cd "$FRONTEND_DIR" || return 1
-    
-    # Installation des dépendances
-    echo "📦 Installation des dépendances npm..."
-    npm ci --production=false || {
-        echo "❌ Erreur installation npm"
-        return 1
-    }
-    
-    # Build optimisé
-    echo "🔨 Construction du build SvelteKit..."
-    npm run build || {
-        echo "❌ Erreur lors du build SvelteKit"
-        return 1
-    }
-    
-    echo "✅ Build SvelteKit terminé"
-    cd - >/dev/null || return 1
-    return 0
-}
+# Note: Frontend SvelteKit déployé séparément sur Vercel/Netlify
+# Cette fonction n'est pas nécessaire pour le backend Laravel sur Railway
 
 # Préparation du backend Laravel
 prepare_backend() {
@@ -70,9 +49,20 @@ prepare_backend() {
     fi
     
     # Générer la clé d'application si nécessaire
-    if ! php artisan config:show app.key >/dev/null 2>&1; then
+    echo "🔑 Vérification de la clé d'application..."
+    if [ -z "$APP_KEY" ]; then
         echo "🔑 Génération de la clé d'application..."
         php artisan key:generate --force
+    fi
+    
+    # Vérification de la connexion MySQL
+    echo "🔗 Test de connexion MySQL..."
+    if [ -n "$DATABASE_URL" ]; then
+        echo "✅ DATABASE_URL détectée pour Railway MySQL"
+    elif [ -n "$MYSQL_HOST" ]; then
+        echo "✅ Variables MySQL Railway détectées"
+    else
+        echo "⚠️ Variables MySQL non trouvées, utilisation de la configuration locale"
     fi
     
     # Migrations de base de données

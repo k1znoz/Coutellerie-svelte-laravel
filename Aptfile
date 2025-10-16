@@ -1,0 +1,4 @@
+php-mysql
+php8.3-mysql
+libmysqlclient-dev
+mysql-client
