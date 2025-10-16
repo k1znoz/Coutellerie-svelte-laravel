@@ -1,4 +1,0 @@
-# Force Railway to use Nixpacks instead of generating Dockerfile
-
-**/Dockerfile\*
-**/.dockerfile\*
