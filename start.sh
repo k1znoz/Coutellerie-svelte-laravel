@@ -3,15 +3,25 @@ set -e
 
 echo "🚀 Starting Laravel application..."
 
-# Install Laravel dependencies if not already done
-if [ ! -d "services/coutellerie-laravel/vendor" ]; then
-    echo "📦 Installing Laravel dependencies..."
-    cd services/coutellerie-laravel
-    composer install --no-dev --optimize-autoloader --no-interaction
-    cd ..
+# Navigate to Laravel directory
+cd services/coutellerie-laravel
+
+# Always ensure Laravel dependencies are installed
+echo "📦 Installing/verifying Laravel dependencies..."
+composer install --no-dev --optimize-autoloader --no-interaction
+
+# Verify that vendor/autoload.php exists
+if [ ! -f "vendor/autoload.php" ]; then
+    echo "❌ Error: vendor/autoload.php not found after composer install"
+    echo "Current directory: $(pwd)"
+    echo "Contents of current directory:"
+    ls -la
+    echo "Contents of vendor directory (if exists):"
+    ls -la vendor/ 2>/dev/null || echo "vendor directory does not exist"
+    exit 1
 fi
 
-cd services/coutellerie-laravel
+echo "✅ Laravel dependencies successfully installed"
 
 # Copy Svelte build to Laravel public (if exists)
 if [ -d "../apps/coutellerie-svelte/build" ]; then
