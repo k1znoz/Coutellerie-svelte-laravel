@@ -10,7 +10,8 @@ SVELTE_PATH="apps/coutellerie-svelte"
 # 1. Build Svelte application
 echo "📦 Building Svelte application..."
 cd $SVELTE_PATH
-npm ci --only=production
+npm ci
+npx svelte-kit sync
 npm run build
 cd ../../
 
