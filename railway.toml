@@ -3,10 +3,12 @@
 builder = "Railpack"
 
 [deploy]
-# Use Procfile for start command
+# Use Procfile for start command  
 restartPolicyType = "ON_FAILURE"
 
-# Environment variables  
+# Environment variables
 [env]
-# Laravel specific variables will be set in Railway dashboard
+# Force PHP version to latest supported
+PHP_VERSION = "8.3"
+# Laravel specific variables will be set in Railway dashboard  
 # MySQL variables will be automatically provided by Railway MySQL service
