@@ -9,21 +9,11 @@ BACKEND_DIR="services/coutellerie-laravel"
 
 # Fonction de vérification des prérequis
 check_prerequisites() {
-    echo "🔍 Vérification des prérequis..."
+    echo "🔍 Vérification de l'environnement Railway..."
     
-    # Vérifier PHP
-    if ! command -v php >/dev/null 2>&1; then
-        echo "❌ PHP non trouvé"
-        return 1
-    fi
-    
-    # Vérifier Composer
-    if ! command -v composer >/dev/null 2>&1; then
-        echo "❌ Composer non trouvé"
-        return 1
-    fi
-    
-    echo "✅ Prérequis validés (PHP + Composer)"
+    # Railway installe automatiquement PHP et Composer via Railpack
+    # Pas besoin de vérifications explicites
+    echo "✅ Environnement Railway prêt"
     return 0
 }
 
@@ -111,25 +101,22 @@ cleanup() {
 main() {
     echo "🎯 Démarrage de l'application Coutellerie Laravel..."
     
-    # Vérification des prérequis
-    if ! check_prerequisites; then
-        echo "❌ Échec de la vérification des prérequis"
-        exit 1
-    fi
+    # Railway gère automatiquement PHP et Composer via Railpack
+    echo "🚀 Environnement Railway initialisé"
     
-    # Préparation du backend (priorité pour Railway)
-    if ! prepare_backend; then
+    # Préparation du backend
+    echo "📦 Préparation du backend Laravel..."
+    prepare_backend || {
         echo "❌ Échec de la préparation du backend"
         exit 1
-    fi
+    }
     
     # Démarrage de l'application
-    if ! start_application; then
+    echo "🌟 Lancement du serveur Laravel..."
+    start_application || {
         echo "❌ Échec du démarrage de l'application"
         exit 1
-    fi
-    
-    echo "🎉 Application démarrée avec succès !"
+    }
 }
 
 # Point d'entrée du script

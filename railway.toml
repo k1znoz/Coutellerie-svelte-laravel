@@ -1,0 +1,12 @@
+[build]
+# Custom build command
+builder = "Railpack"
+
+[deploy]
+# Start command simplified for Railway
+startCommand = "bash start-simple.sh"
+
+# Environment variables
+[env]
+# Laravel specific variables will be set in Railway dashboard
+# MySQL variables will be automatically provided by Railway MySQL service
