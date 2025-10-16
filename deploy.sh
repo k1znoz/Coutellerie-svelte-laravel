@@ -3,12 +3,24 @@
 # Railway deployment script for Laravel
 echo "🚀 Starting Railway deployment..."
 
+# Install PHP extensions first (in case Aptfile didn't work)
+echo "🔧 Installing PHP extensions via apt..."
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -qq
+apt-get install -y -qq php8.3-pdo-mysql php8.3-mysql php8.3-mysqli php8.3-intl php8.3-zip php8.3-xml php8.3-curl php8.3-mbstring php8.3-gd
+
 # Change to Laravel directory
 cd services/coutellerie-laravel || exit 1
 
+# Test PHP extensions immediately after installation
+echo "🔍 Testing PHP extensions after installation..."
+php -r "echo 'PDO MySQL: ' . (extension_loaded('pdo_mysql') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
+php -r "echo 'MySQL: ' . (extension_loaded('mysql') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
+php -r "echo 'MySQLi: ' . (extension_loaded('mysqli') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
+
 # Install Composer dependencies
 echo "📦 Installing Composer dependencies..."
-composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip --ignore-platform-req=ext-pdo_mysql || exit 1
+composer install --no-dev --optimize-autoloader || exit 1
 
 # Create .env from .env.production
 echo "📄 Creating .env file..."
@@ -59,12 +71,6 @@ echo "🗄️ Running database migrations..."
 php artisan migrate --force || {
     echo "⚠️ Migrations failed, continuing..."
 }
-
-# Test PHP extensions
-echo "🔍 Testing PHP extensions..."
-php -r "echo 'PDO MySQL: ' . (extension_loaded('pdo_mysql') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
-php -r "echo 'MySQL: ' . (extension_loaded('mysql') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
-php -r "echo 'MySQLi: ' . (extension_loaded('mysqli') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
 
 # Test database connection
 echo "🔗 Testing database connection..."
