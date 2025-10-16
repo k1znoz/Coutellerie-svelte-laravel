@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Laravel
+services/coutellerie-laravel/vendor/
+services/coutellerie-laravel/storage/logs/*
+services/coutellerie-laravel/storage/framework/cache/*
+services/coutellerie-laravel/storage/framework/sessions/*
+services/coutellerie-laravel/storage/framework/views/*
+services/coutellerie-laravel/bootstrap/cache/*
+
+# Svelte
+apps/coutellerie-svelte/.svelte-kit/
+apps/coutellerie-svelte/build/
+apps/coutellerie-svelte/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Logs
+*.log
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Temporary files
+*.tmp
+*.temp

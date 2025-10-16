@@ -1,0 +1,21 @@
+[variables]
+NIXPACKS_PHP_VERSION = "8.2"
+NIXPACKS_NODE_VERSION = "18"
+
+[phases.setup]
+nixPkgs = ["php82", "nodejs_18", "nginx"]
+aptPkgs = ["curl", "git", "unzip"]
+
+[phases.install]
+dependsOn = ["setup"]
+cmds = [
+    "chmod +x build.sh",
+    "chmod +x start.sh"
+]
+
+[phases.build]
+dependsOn = ["install"]
+cmds = ["./build.sh"]
+
+[start]
+cmd = "./start.sh"
