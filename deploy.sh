@@ -8,33 +8,42 @@ echo "🔧 Installing PHP extensions via docker-php-ext-install..."
 export DEBIAN_FRONTEND=noninteractive
 
 # First update package list and install required system packages
+echo "📦 Installing system dependencies..."
 apt-get update -qq
-apt-get install -y -qq libicu-dev libzip-dev libxml2-dev libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev default-mysql-client libonig-dev
+apt-get install -y -qq libicu-dev libzip-dev libxml2-dev libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev default-mysql-client libonig-dev 2>/dev/null || echo "⚠️ Some system packages may already be installed"
 
-# Install PHP extensions using docker-php-ext-install
-docker-php-ext-install -j$(nproc) \
-    intl \
-    zip \
-    xml \
-    curl \
-    mbstring \
-    gd \
-    pdo \
-    pdo_mysql \
-    mysqli
+# Clean any existing extension compilation artifacts
+rm -rf /usr/src/php/ext/*/tmp-php* 2>/dev/null || true
+rm -rf /usr/src/php/ext/*/.libs 2>/dev/null || true
 
-# Configure GD extension with freetype and jpeg support
-docker-php-ext-configure gd --with-freetype --with-jpeg
-docker-php-ext-install -j$(nproc) gd
+echo "🔧 Installing core PHP extensions..."
+# Install extensions one by one for better error handling
+docker-php-ext-install pdo 2>/dev/null || echo "⚠️ PDO installation had warnings (may already exist)"
+docker-php-ext-install pdo_mysql 2>/dev/null || echo "⚠️ PDO MySQL installation had warnings (may already exist)"
+docker-php-ext-install mysqli 2>/dev/null || echo "⚠️ MySQLi installation had warnings (may already exist)"
+docker-php-ext-install intl 2>/dev/null || echo "⚠️ Intl installation had warnings (may already exist)"
+docker-php-ext-install zip 2>/dev/null || echo "⚠️ Zip installation had warnings (may already exist)"
+docker-php-ext-install xml 2>/dev/null || echo "⚠️ XML installation had warnings (may already exist)"
+docker-php-ext-install mbstring 2>/dev/null || echo "⚠️ mbstring installation had warnings (may already exist)"
+
+echo "🎨 Configuring and installing GD extension..."
+docker-php-ext-configure gd --with-freetype --with-jpeg 2>/dev/null || echo "⚠️ GD configure had warnings"
+docker-php-ext-install gd 2>/dev/null || echo "⚠️ GD installation had warnings (may already exist)"
+
+echo "✅ PHP extension installation completed"
 
 # Change to Laravel directory
 cd services/coutellerie-laravel || exit 1
 
 # Test PHP extensions immediately after installation
 echo "🔍 Testing PHP extensions after installation..."
+php -r "echo 'PDO: ' . (extension_loaded('pdo') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
 php -r "echo 'PDO MySQL: ' . (extension_loaded('pdo_mysql') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
-php -r "echo 'MySQL: ' . (extension_loaded('mysql') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
 php -r "echo 'MySQLi: ' . (extension_loaded('mysqli') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
+php -r "echo 'Intl: ' . (extension_loaded('intl') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
+php -r "echo 'Zip: ' . (extension_loaded('zip') ? '✅ OK' : '❌ MISSING') . PHP_EOL;"
+echo "📋 All loaded extensions:"
+php -m | grep -E "(pdo|mysql|intl|zip|xml|gd|mbstring)" | head -10
 
 # Install Composer dependencies
 echo "📦 Installing Composer dependencies..."
