@@ -40,37 +40,31 @@ fi
 echo "🗄️ Waiting for MySQL database to be ready..."
 sleep 5
 
-# Test database connection and create database if needed
+# Debug: Show all environment variables related to database
+echo "🔍 Debugging database configuration..."
+echo "=== Environment Variables ==="
+env | grep -E "(DB_|MYSQL)" | sort
+echo "=========================="
+
+# Show Laravel database configuration
+echo "📋 Laravel Database Config:"
+php artisan config:show database.connections.mysql 2>/dev/null || echo "Failed to show database config"
+
+# Simple database connection test
 echo "🔍 Testing database connection..."
-if ! php artisan tinker --execute="try { DB::connection()->getPdo(); echo 'Database connected successfully!'; } catch (Exception \$e) { echo 'Connection failed: ' . \$e->getMessage(); throw \$e; }" 2>/dev/null; then
-    echo "⚠️ Database connection failed, attempting to create database..."
-    
-    # Try to create the database
-    php artisan tinker --execute="
-        try {
-            \$dbName = config('database.connections.mysql.database');
-            \$connection = new PDO(
-                'mysql:host=' . config('database.connections.mysql.host') . ';port=' . config('database.connections.mysql.port'),
-                config('database.connections.mysql.username'),
-                config('database.connections.mysql.password')
-            );
-            \$connection->exec('CREATE DATABASE IF NOT EXISTS `' . \$dbName . '`');
-            echo 'Database created or already exists: ' . \$dbName;
-        } catch (Exception \$e) {
-            echo 'Failed to create database: ' . \$e->getMessage();
-        }
-    " || echo "Database creation attempt completed"
-    
-    # Test connection again
-    echo "🔍 Testing database connection again..."
-    php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database connected successfully!';" || {
-        echo "❌ Database connection still failed. Debugging info:"
-        php artisan config:show database
-        echo "Environment variables:"
-        env | grep DB_
-        exit 1
-    }
-fi
+php artisan tinker --execute="
+try {
+    \$pdo = DB::connection()->getPdo();
+    echo 'SUCCESS: Database connected!';
+    echo 'Connection info: ' . \$pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS);
+} catch (Exception \$e) {
+    echo 'FAILED: Database connection error: ' . \$e->getMessage();
+    echo 'Config database: ' . config('database.connections.mysql.database', 'NOT_SET');
+    echo 'Config host: ' . config('database.connections.mysql.host', 'NOT_SET');
+    echo 'Config port: ' . config('database.connections.mysql.port', 'NOT_SET');
+    echo 'Config username: ' . config('database.connections.mysql.username', 'NOT_SET');
+}
+"
 
 # Show current migration status
 echo "📋 Checking current migration status..."
