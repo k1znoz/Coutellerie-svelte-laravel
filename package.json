@@ -3,7 +3,7 @@
     "private": true,
     "version": "1.0.0",
     "scripts": {
-        "build": "cd apps/coutellerie-svelte && npm ci && npx svelte-kit sync && npm run build",
+        "build": "bash build.sh",
         "start": "bash start.sh"
     },
     "engines": {
