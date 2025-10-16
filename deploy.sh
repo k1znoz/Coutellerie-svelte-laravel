@@ -52,7 +52,29 @@ composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-intl -
 # Create .env from .env.production with environment variable substitution
 echo "📄 Creating .env file with environment variables..."
 if [ -f .env.production ]; then
+    echo "🔍 Before substitution - checking .env.production database section:"
+    grep -E "^DB_" .env.production || echo "No DB_ variables found in .env.production"
+    
+    # Check if Railway provides MySQL variables, if not try to extract from DATABASE_URL
+    if [ -z "$MYSQL_HOST" ] && [ -n "$DATABASE_URL" ]; then
+        echo "🔄 MYSQL_* variables not found, extracting from DATABASE_URL..."
+        # Extract MySQL connection details from DATABASE_URL
+        # Format: mysql://user:password@host:port/database
+        export MYSQL_HOST=$(echo "$DATABASE_URL" | sed -n 's/.*@\([^:]*\):.*/\1/p')
+        export MYSQL_PORT=$(echo "$DATABASE_URL" | sed -n 's/.*:\([0-9]*\)\/.*/\1/p')
+        export MYSQL_DATABASE=$(echo "$DATABASE_URL" | sed -n 's/.*\/\([^?]*\).*/\1/p')
+        export MYSQL_USER=$(echo "$DATABASE_URL" | sed -n 's/.*\/\/\([^:]*\):.*/\1/p')
+        export MYSQL_PASSWORD=$(echo "$DATABASE_URL" | sed -n 's/.*\/\/[^:]*:\([^@]*\)@.*/\1/p')
+        
+        echo "🔍 Extracted from DATABASE_URL:"
+        echo "  MYSQL_HOST: ${MYSQL_HOST:-'FAILED'}"
+        echo "  MYSQL_PORT: ${MYSQL_PORT:-'FAILED'}"
+        echo "  MYSQL_DATABASE: ${MYSQL_DATABASE:-'FAILED'}"
+        echo "  MYSQL_USER: ${MYSQL_USER:-'FAILED'}"
+    fi
+    
     # Use envsubst to substitute environment variables, but preserve Laravel's ${} syntax for non-Railway vars
+    echo "🔄 Running envsubst with variables: MYSQL_HOST, MYSQL_PORT, MYSQL_DATABASE, MYSQL_USER, MYSQL_PASSWORD, DATABASE_URL"
     envsubst '$MYSQL_HOST $MYSQL_PORT $MYSQL_DATABASE $MYSQL_USER $MYSQL_PASSWORD $DATABASE_URL' < .env.production > .env || exit 1
     echo "✅ .env file created from .env.production with variable substitution"
 else
@@ -79,6 +101,10 @@ LOG_LEVEL=info
 EOF
 fi
 
+# Debug: Show all Railway environment variables
+echo "🔍 Railway environment variables:"
+env | grep -E "(MYSQL_|DATABASE_)" | sort || echo "No MySQL environment variables found"
+
 # Show database configuration for debugging (without passwords)
 echo "🔍 Database configuration:"
 echo "DB_HOST: ${MYSQL_HOST:-'NOT_SET'}"
@@ -86,6 +112,10 @@ echo "DB_PORT: ${MYSQL_PORT:-'NOT_SET'}"
 echo "DB_DATABASE: ${MYSQL_DATABASE:-'NOT_SET'}"
 echo "DB_USERNAME: ${MYSQL_USER:-'NOT_SET'}"
 echo "DATABASE_URL: ${DATABASE_URL:0:20}..." # Show first 20 chars only
+
+# Debug: Show what's actually in the .env file after substitution
+echo "🔍 Generated .env file (database section):"
+grep -E "^DB_" .env || echo "No DB_ variables found in .env"
 
 # Generate APP_KEY if not set
 if [ -z "$APP_KEY" ]; then
