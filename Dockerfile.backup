@@ -10,6 +10,9 @@ COPY apps/coutellerie-svelte/ ./
 RUN npx svelte-kit sync
 RUN npm run build
 
+# Vérifier que le build existe
+RUN ls -la build/ || (echo "Build failed - no build directory found" && exit 1)
+
 # Stage principal PHP/Laravel
 FROM php:8.2-fpm-alpine
 
