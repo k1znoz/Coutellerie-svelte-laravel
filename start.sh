@@ -6,6 +6,12 @@ echo "🚀 Starting Laravel application..."
 # Navigate to Laravel directory
 cd services/coutellerie-laravel
 
+# Copy production environment file if in production
+if [ ! -f ".env" ] && [ -f ".env.production" ]; then
+    echo "🔧 Setting up production environment..."
+    cp .env.production .env
+fi
+
 # Always ensure Laravel dependencies are installed
 echo "📦 Installing/verifying Laravel dependencies..."
 composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
@@ -29,6 +35,10 @@ if [ -d "../apps/coutellerie-svelte/build" ]; then
     mkdir -p public/app
     cp -r ../apps/coutellerie-svelte/build/* public/app/ 2>/dev/null || true
 fi
+
+# Wait a bit for MySQL service to be ready
+echo "🗄️ Waiting for MySQL database to be ready..."
+sleep 5
 
 # Run migrations
 echo "📊 Running database migrations..."
