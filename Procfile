@@ -1,0 +1,1 @@
+web: cd services/coutellerie-laravel && composer install --no-dev --optimize-autoloader --ignore-platform-reqs && php artisan key:generate --force && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT

@@ -1,12 +1,12 @@
 [build]
-# Custom build command
+# Use Railway's automatic PHP/Laravel detection
 builder = "Railpack"
 
 [deploy]
-# Start command simplified for Railway
-startCommand = "bash start-simple.sh"
+# Use Procfile for start command
+restartPolicyType = "ON_FAILURE"
 
-# Environment variables
+# Environment variables  
 [env]
 # Laravel specific variables will be set in Railway dashboard
 # MySQL variables will be automatically provided by Railway MySQL service
