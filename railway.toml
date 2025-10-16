@@ -2,10 +2,9 @@
 builder = "nixpacks"
 
 [deploy]
-startCommand = "./start.sh"
+startCommand = "bash start.sh"
 restartPolicyType = "always"
 
 [variables]
 NODE_VERSION = "18"
 PHP_VERSION = "8.2"
-NIXPACKS_NO_DOCKERFILE = "true"
