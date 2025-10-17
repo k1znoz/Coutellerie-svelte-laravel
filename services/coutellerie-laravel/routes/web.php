@@ -16,9 +16,9 @@ Route::get('/', function () {
     ]);
 });
 
-// Route login technique pour Laravel (utilisateurs utilisent /admin)
+// Route login standard de Laravel
 Route::get('/login', function () {
-    abort(404); // Empêche l'accès direct à /login
+    return view('auth.login'); // Vue login Laravel standard
 })->name('login');
 
 // Toutes les autres routes sont gérées par Filament
