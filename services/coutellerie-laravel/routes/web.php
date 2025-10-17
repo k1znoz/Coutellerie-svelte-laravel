@@ -16,10 +16,10 @@ Route::get('/', function () {
     ]);
 });
 
-// Charger les routes d'authentification
-require __DIR__.'/auth.php';
-
-// Filament gère automatiquement l'authentification sur /admin
+// Route login technique pour Laravel (utilisateurs utilisent /admin)
+Route::get('/login', function () {
+    abort(404); // Empêche l'accès direct à /login
+})->name('login');
 
 // Toutes les autres routes sont gérées par Filament
 // Filament utilise automatiquement le préfixe /admin
