@@ -1,6 +1,6 @@
 [build]
-# Use Railway's automatic PHP/Laravel detection
-builder = "Railpack"
+# Use custom build process for monorepo structure
+workingDir = "services/coutellerie-laravel"
 
 [deploy]
 # Use Procfile for start command  
