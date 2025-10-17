@@ -55,9 +55,32 @@ if [ -f .env.production ]; then
     echo "🔍 Before substitution - checking .env.production database section:"
     grep -E "^DB_" .env.production || echo "No DB_ variables found in .env.production"
     
-    # Use envsubst to substitute all MySQL variables
-    echo "🔄 Running envsubst with all MySQL variables..."
-    envsubst '$MYSQL_PUBLIC_URL $MYSQLHOST $MYSQLPORT $MYSQLDATABASE $MYSQLUSER $MYSQLPASSWORD' < .env.production > .env || exit 1
+    # Create .env file with dynamic database URL detection
+    echo "🔄 Creating .env from .env.production..."
+    
+    # Copy .env.production as base
+    cp .env.production .env
+    
+    # Replace database URL with the best available option
+    if [ -n "$DATABASE_URL" ]; then
+        echo "✅ Using DATABASE_URL: ${DATABASE_URL:0:50}..."
+        sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}|$DATABASE_URL|g" .env
+    elif [ -n "$MYSQL_PUBLIC_URL" ]; then
+        echo "✅ Using MYSQL_PUBLIC_URL: ${MYSQL_PUBLIC_URL:0:50}..."
+        sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}|$MYSQL_PUBLIC_URL|g" .env
+    elif [ -n "$MYSQL_URL" ]; then
+        echo "✅ Using MYSQL_URL: ${MYSQL_URL:0:50}..."
+        sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}|$MYSQL_URL|g" .env
+    else
+        echo "❌ No database URL found! Using fallback configuration..."
+        sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}||g" .env
+        # Set individual database variables if available
+        [ -n "$MYSQLHOST" ] && sed -i "s/DB_HOST=127.0.0.1/DB_HOST=$MYSQLHOST/g" .env
+        [ -n "$MYSQLPORT" ] && sed -i "s/DB_PORT=3306/DB_PORT=$MYSQLPORT/g" .env
+        [ -n "$MYSQLDATABASE" ] && sed -i "s/DB_DATABASE=laravel/DB_DATABASE=$MYSQLDATABASE/g" .env
+        [ -n "$MYSQLUSER" ] && sed -i "s/DB_USERNAME=root/DB_USERNAME=$MYSQLUSER/g" .env
+        [ -n "$MYSQLPASSWORD" ] && sed -i "s/DB_PASSWORD=/DB_PASSWORD=$MYSQLPASSWORD/g" .env
+    fi
     echo "✅ .env file created from .env.production with variable substitution"
 else
     echo "⚠️ .env.production not found, creating .env with MySQL variables..."
@@ -86,9 +109,10 @@ EOF
 fi
 
 # Debug: Show Railway environment info
-echo "🔍 Railway environment:"
+echo "🔍 Railway environment variables:"
 echo "MYSQL_PUBLIC_URL available: ${MYSQL_PUBLIC_URL:+YES}"
 echo "MYSQL_URL available: ${MYSQL_URL:+YES}"
+echo "DATABASE_URL available: ${DATABASE_URL:+YES}"
 
 # Test different possible variable names
 echo "🔍 Testing variable name variations:"
@@ -100,13 +124,17 @@ echo "MYSQLDATABASE: ${MYSQLDATABASE:-'NOT_SET'}"
 echo "MYSQL_DATABASE: ${MYSQL_DATABASE:-'NOT_SET'}"
 echo "MYSQLUSER: ${MYSQLUSER:-'NOT_SET'}"
 echo "MYSQL_USER: ${MYSQL_USER:-'NOT_SET'}"
-echo "RAILWAY_ENVIRONMENT: ${RAILWAY_ENVIRONMENT:-'NOT_SET'}"
-echo "RAILWAY_PROJECT_NAME: ${RAILWAY_PROJECT_NAME:-'NOT_SET'}"
-echo "RAILWAY_SERVICE_NAME: ${RAILWAY_SERVICE_NAME:-'NOT_SET'}"
+echo "MYSQLPASSWORD: ${MYSQLPASSWORD:-'NOT_SET'}"
+echo "MYSQL_PASSWORD: ${MYSQL_PASSWORD:-'NOT_SET'}"
 
-# Check for private network variables
-echo "🔍 ALL Railway MySQL variables found:"
-env | grep -i mysql | sort
+echo "🔍 ALL Railway environment variables (MySQL related):"
+env | grep -i mysql | sort || echo "No MySQL variables found"
+
+echo "🔍 ALL Railway environment variables (DATABASE related):"
+env | grep -i database | sort || echo "No DATABASE variables found"
+
+echo "🔍 First 20 environment variables for debugging:"
+env | head -20
 
 # Show database configuration for debugging
 echo "🔍 Database configuration:"
