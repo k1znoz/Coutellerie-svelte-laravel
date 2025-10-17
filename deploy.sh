@@ -122,22 +122,26 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     echo "🔍 Checking if admin/login route exists specifically..."
     php artisan route:list | grep "admin/login" || echo "⚠️ admin/login route not found"
     
-    echo "🔍 Checking Filament panels via artisan..."
-    php artisan about | grep -i filament || echo "⚠️ Filament not detected in artisan about"
+    echo "� Force Filament route registration..."
+    php artisan route:cache || echo "⚠️ Route cache failed"
+    php artisan route:clear || echo "⚠️ Route clear failed"
+    
+    echo "🔍 Final route verification..."
+    php artisan route:list --path=admin || echo "⚠️ No admin routes found"
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
 
-# Cache config
+# Cache config et routes APRÈS que tout soit configuré
 echo "⚡ Optimizing Laravel for production..."
 php artisan config:clear || echo "⚠️ Config clear failed"
 php artisan route:clear || echo "⚠️ Route clear failed"
 php artisan view:clear || echo "⚠️ View clear failed"
 php artisan cache:clear || echo "⚠️ Cache clear failed"
 
-# Ne pas cacher les routes en production pour Filament
+# Cache la config mais PAS les routes pour Filament
 php artisan config:cache > /dev/null 2>&1
-# php artisan route:cache > /dev/null 2>&1  # Désactivé pour Filament
+# Laissons les routes non-cachées pour Filament
 php artisan view:cache > /dev/null 2>&1 || echo "⚠️ View cache failed"
 
 # Start server
