@@ -1,9 +1,10 @@
 // Service API pour interagir avec le backend
 
 import type { Knife, ContactFormData } from '$lib/types.ts';
+import { env } from '$env/dynamic/public';
 
-// URL de base de l'API
-export const API_BASE_URL = 'http://localhost:8000/api/';
+// URL de base de l'API - utilise la variable d'environnement ou localhost en fallback
+export const API_BASE_URL = env.PUBLIC_API_URL || 'http://localhost:8000/api';
 
 // Types pour les options et réponses API
 interface ApiOptions {
@@ -57,7 +58,7 @@ export async function getAllKnives(options: ApiOptions = {}): Promise<Knife[]> {
 		'Content-Type': 'application/json'
 	};
 
-	const response = await fetch(`${API_BASE_URL}knives`, {
+	const response = await fetch(`${API_BASE_URL}/knives`, {
 		method: 'GET',
 		headers
 	});
