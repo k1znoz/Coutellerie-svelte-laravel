@@ -15,12 +15,9 @@ apt-get install -y -qq \
     default-mysql-client \
     libmysqlclient-dev > /dev/null 2>&1
 
-# Use docker-php-ext-install which is Railway/Docker compatible
-echo "📦 Installing extensions via docker-php-ext-install..."
-docker-php-ext-install pdo_mysql > /dev/null 2>&1 || echo "⚠️ pdo_mysql failed"
-docker-php-ext-install mysqli > /dev/null 2>&1 || echo "⚠️ mysqli failed"  
-docker-php-ext-install intl > /dev/null 2>&1 || echo "⚠️ intl failed"
-docker-php-ext-install zip > /dev/null 2>&1 || echo "⚠️ zip failed"
+# Skip MySQL extensions for now - use SQLite to get app running
+echo "📦 Using SQLite temporarily to bypass MySQL extension issues..."
+# We'll fix MySQL later, but this gets the app running immediately
 
 # Change to Laravel directory
 cd services/coutellerie-laravel || exit 1
@@ -41,20 +38,37 @@ composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scri
 # Run package discovery
 php artisan package:discover --ansi > /dev/null 2>&1 || echo "⚠️ Package discovery failed"
 
-# Setup environment
-echo "⚙️ Setting up environment..."
+# Setup environment with SQLite for immediate deployment
+echo "⚙️ Setting up environment with SQLite..."
 if [ -f .env.production ]; then
     cp .env.production .env
-    
-    # Use best available database URL
-    if [ -n "$DATABASE_URL" ]; then
-        sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}|$DATABASE_URL|g" .env
-    elif [ -n "$MYSQL_URL" ]; then
-        sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}|$MYSQL_URL|g" .env  
-    elif [ -n "$MYSQL_PUBLIC_URL" ]; then
-        sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}|$MYSQL_PUBLIC_URL|g" .env
-    fi
+else
+    # Create basic .env if not found
+    cat > .env << 'EOF'
+APP_NAME="Coutellerie Svelte Laravel"
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://coutellerie-production.up.railway.app
+EOF
 fi
+
+# Override database config to use SQLite temporarily
+cat >> .env << 'EOF'
+
+# Temporary SQLite database (to get app running)
+DB_CONNECTION=sqlite
+DB_DATABASE=/app/database/database.sqlite
+
+SESSION_DRIVER=database
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+LOG_CHANNEL=stderr
+LOG_LEVEL=info
+EOF
+
+# Create SQLite database
+mkdir -p /app/database
+touch /app/database/database.sqlite
 
 # Generate app key
 if [ -z "$APP_KEY" ]; then
