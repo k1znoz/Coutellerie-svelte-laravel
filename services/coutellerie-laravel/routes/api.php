@@ -14,13 +14,7 @@ Route::get('/health', function () {
     ]);
 });
 
-// Route d'authentification
-Route::get('/auth', function (Request $request) {
-    return response()->json([
-        'authenticated' => $request->user() !== null,
-        'user' => $request->user()
-    ]);
-});
+
 
 // Routes API pour les couteaux
 Route::prefix('knives')->group(function () {
