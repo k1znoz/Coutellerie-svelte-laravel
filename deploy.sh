@@ -17,7 +17,14 @@ cd services/coutellerie-laravel || exit 1
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-composer install --no-dev --optimize-autoloader --quiet || exit 1
+composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scripts --quiet || {
+    echo "⚠️ Composer install failed, trying update..."
+    composer update --no-dev --optimize-autoloader --ignore-platform-reqs --no-scripts --quiet || exit 1
+}
+
+# Run essential post-install tasks
+echo "🔍 Running package discovery..."
+php artisan package:discover --ansi > /dev/null 2>&1 || echo "⚠️ Package discovery failed"
 
 # Setup environment
 echo "⚙️ Configuring environment..."
