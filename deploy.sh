@@ -79,6 +79,10 @@ echo "🔗 Testing database connection..."
 if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅';" 2>/dev/null; then
     echo "🗄️ Running migrations..."
     php artisan migrate --force || echo "⚠️ Migrations failed"
+    
+    echo "🎨 Setting up Filament..."
+    php artisan filament:install --panels --quiet || echo "⚠️ Filament install failed"
+    php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
