@@ -115,7 +115,10 @@ else
 fi
 
 # Cache config
+echo "⚡ Optimizing Laravel for production..."
 php artisan config:cache > /dev/null 2>&1
+php artisan route:cache > /dev/null 2>&1 || echo "⚠️ Route cache failed"
+php artisan view:cache > /dev/null 2>&1 || echo "⚠️ View cache failed"
 
 # Start server
 echo "🌟 Starting server on port ${PORT:-8000}..."
