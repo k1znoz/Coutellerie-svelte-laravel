@@ -1,7 +1,6 @@
 [build]
-# Use Railway's automatic PHP/Laravel detection with custom build
+# Use Railway's automatic PHP/Laravel detection
 builder = "Railpack"
-buildCommand = "bash build.sh"
 
 [deploy]
 # Use Procfile for start command  
