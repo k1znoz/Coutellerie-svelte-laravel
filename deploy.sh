@@ -1,149 +1,49 @@
 #!/bin/bash
 
-# Railway deployment script for Laravel - Simple approach
-echo "🚀 Railway Laravel deployment..."
+# Script de déploiement pour Railway - Coutellerie Svelte Laravel
+echo "🚀 Démarrage du déploiement Railway..."
 
-# Install PHP extensions using docker-php-ext-install (Railway compatible)
-echo "� Installing PHP extensions for Railway..."
-export DEBIAN_FRONTEND=noninteractive
-apt-get update -qq > /dev/null 2>&1
+# Configuration des variables d'environnement Laravel
+export APP_ENV=${APP_ENV:-production}
+export APP_DEBUG=${APP_DEBUG:-false}
+export APP_KEY=${APP_KEY}
+export APP_URL=${APP_URL:-https://coutellerie-production.up.railway.app}
 
-# Install required development libraries
-apt-get install -y -qq \
-    libicu-dev \
-    libzip-dev \
-    default-mysql-client \
-    libmysqlclient-dev > /dev/null 2>&1
+# Configuration MySQL avec les variables Railway
+export DB_CONNECTION=mysql
+export DB_HOST=${MYSQLHOST:-mysql.railway.internal}
+export DB_PORT=${MYSQLPORT:-3306}
+export DB_DATABASE=${MYSQLDATABASE:-railway}
+export DB_USERNAME=${MYSQLUSER:-root}
+export DB_PASSWORD=${MYSQLPASSWORD}
 
-# Try to get MySQL extensions working
-echo "🔧 Attempting to install MySQL extensions..."
+echo "📦 Installation des dépendances Laravel..."
+cd services/coutellerie-laravel
+composer install --no-dev --optimize-autoloader --no-interaction
 
-# Method 1: Try system packages first
-apt-get install -y -qq php-mysql php-pdo-mysql > /dev/null 2>&1 || echo "System packages failed"
-
-# Method 2: Enable any existing extensions
-echo "extension=pdo_mysql" > /usr/local/etc/php/conf.d/pdo_mysql.ini || true
-echo "extension=mysqli" > /usr/local/etc/php/conf.d/mysqli.ini || true
-
-# Method 3: Last resort - try compilation with minimal deps
-docker-php-ext-install pdo_mysql > /dev/null 2>&1 || echo "pdo_mysql compilation failed"
-docker-php-ext-install mysqli > /dev/null 2>&1 || echo "mysqli compilation failed"
-
-# Change to Laravel directory
-cd services/coutellerie-laravel || exit 1
-
-# Verify extensions are properly loaded
-echo "🔍 Checking PHP extensions..."
-php -r "echo 'PDO: ' . (extension_loaded('pdo') ? '✅' : '❌') . PHP_EOL;"
-php -r "echo 'PDO MySQL: ' . (extension_loaded('pdo_mysql') ? '✅' : '❌') . PHP_EOL;"
-php -r "echo 'MySQLi: ' . (extension_loaded('mysqli') ? '✅' : '❌') . PHP_EOL;"
-php -r "echo 'Available PDO drivers: ' . implode(', ', PDO::getAvailableDrivers()) . PHP_EOL;" 2>/dev/null || echo "PDO not available"
-
-# Install dependencies
-echo "📦 Installing Composer dependencies..."
-composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scripts --quiet || {
-    composer update --no-dev --optimize-autoloader --ignore-platform-reqs --no-scripts --quiet || exit 1
-}
-
-echo "🔧 Regenerating Composer autoload..."
-composer dump-autoload --optimize --quiet
-
-# Run package discovery
-echo "🔍 Running package discovery..."
-php artisan package:discover --ansi || echo "⚠️ Package discovery failed"
-php artisan config:cache --quiet || echo "⚠️ Config cache failed"
-
-echo "🚀 Bootstrapping Laravel application..."
-php artisan about --only=environment || echo "⚠️ Laravel bootstrap check failed"
-
-# Setup environment with Railway MySQL
-echo "⚙️ Setting up environment with MySQL..."
-
-# Use existing .env file (already configured with Railway variables)
-echo "🔄 Using existing .env configuration..."
-echo "✅ Environment configuration ready"
-
-# Test database connection before migrations
-echo "🔗 Testing database connection..."
-if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅';" 2>/dev/null; then
-    echo "🗄️ Running migrations..."
-    php artisan migrate --force || echo "⚠️ Migrations failed"
-    
-    echo "� Running seeders..."
-    php artisan db:seed --force || echo "⚠️ Seeders failed"
-    
-    echo "🎨 Setting up Filament..."
-    php artisan filament:install --panels --force --quiet || echo "⚠️ Filament install failed"
-    
-    echo "📦 Publishing Filament auth views and resources..."
-    php artisan vendor:publish --tag=filament-config --force || echo "⚠️ Filament config publish failed"
-    php artisan vendor:publish --tag=filament-views --force || echo "⚠️ Filament views publish failed"
-    php artisan vendor:publish --tag=filament-panels --force || echo "⚠️ Filament panels publish failed"
-    
-    echo "🎨 Compiling Filament assets..."
-    php artisan filament:assets --force || echo "⚠️ Filament assets failed"
-    
-    echo "� Force Filament panel discovery..."
-    php artisan filament:clear-cached-components || echo "⚠️ Clear components failed"
-    
-    php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
-    
-    echo "🔧 Publishing Filament assets and clearing cache..."
-    php artisan vendor:publish --tag=filament-assets --force || echo "⚠️ Publishing assets failed"
-    
-    echo "🧹 Clearing ALL caches for clean state..."
-    php artisan optimize:clear || echo "⚠️ Optimize clear failed"
-    php artisan view:clear || echo "⚠️ View clear failed" 
-    php artisan config:clear || echo "⚠️ Config clear failed"
-    php artisan route:clear || echo "⚠️ Route clear failed"
-    php artisan cache:clear || echo "⚠️ Cache clear failed"
-    
-    echo "🔄 Regenerating autoload..."
-    composer dump-autoload --optimize --quiet
-    
-    echo "🎨 Building Filament assets from scratch..."
-    npm install || echo "⚠️ NPM install failed"
-    npm run build || echo "⚠️ NPM build failed"
-    
-    echo "🔍 Listing available routes..."
-    php artisan route:list || echo "⚠️ Route list failed"
-    
-    echo "🔍 Checking Filament installation..."
-    php -r "
-        require_once 'vendor/autoload.php';
-        echo 'Filament Panel loaded: ' . (class_exists('Filament\\Panel') ? '✅' : '❌') . PHP_EOL;
-        echo 'Filament Facades loaded: ' . (class_exists('Filament\\Facades\\Filament') ? '✅' : '❌') . PHP_EOL;
-        echo 'AdminPanelProvider loaded: ' . (class_exists('App\\Providers\\Filament\\AdminPanelProvider') ? '✅' : '❌') . PHP_EOL;
-    "
-    
-    echo "🔍 Testing Filament routes registration..."
-    php artisan route:list --path=admin || echo "⚠️ Filament routes not found"
-    
-    echo "🔍 Checking if admin/login route exists specifically..."
-    php artisan route:list | grep "admin/login" || echo "⚠️ admin/login route not found"
-    
-    echo "� Force Filament route registration..."
-    php artisan route:cache || echo "⚠️ Route cache failed"
-    php artisan route:clear || echo "⚠️ Route clear failed"
-    
-    echo "🔍 Final route verification..."
-    php artisan route:list --path=admin || echo "⚠️ No admin routes found"
-else
-    echo "❌ Database connection failed, skipping migrations"
+echo "🔧 Configuration Laravel..."
+# Génération de la clé APP_KEY si elle n'existe pas
+if [ -z "$APP_KEY" ]; then
+    echo "🔑 Génération d'une nouvelle clé d'application..."
+    php artisan key:generate --force
 fi
 
-# Cache config et routes APRÈS que tout soit configuré
-echo "⚡ Optimizing Laravel for production..."
-php artisan config:clear || echo "⚠️ Config clear failed"
-php artisan route:clear || echo "⚠️ Route clear failed"
-php artisan view:clear || echo "⚠️ View clear failed"
-php artisan cache:clear || echo "⚠️ Cache clear failed"
+# Cache des configurations
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
 
-# Cache la config mais PAS les routes pour Filament
-php artisan config:cache > /dev/null 2>&1
-# Laissons les routes non-cachées pour Filament
-php artisan view:cache > /dev/null 2>&1 || echo "⚠️ View cache failed"
+echo "🗄️  Migrations de la base de données..."
+php artisan migrate --force
 
-# Start server
-echo "🌟 Starting server on port ${PORT:-8000}..."
-php artisan serve --host=0.0.0.0 --port="${PORT:-8000}"
+echo "📁 Optimisation des fichiers..."
+php artisan storage:link
+
+echo "🔧 Installation des dépendances Svelte..."
+cd ../../apps/coutellerie-svelte
+npm ci
+npm run build
+
+echo "🌐 Démarrage du serveur Laravel..."
+cd ../../services/coutellerie-laravel
+php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
