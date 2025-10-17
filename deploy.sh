@@ -82,6 +82,9 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     echo "🔄 Force Filament panel discovery..."
     php artisan filament:clear-cached-components || echo "⚠️ Clear components failed"
     
+    echo "🔑 Force generation of Filament auth pages..."
+    php artisan make:filament-page Auth/Login --type=simple || echo "⚠️ Auth page creation failed"
+    
     php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
     
     echo "🔧 Publishing Filament assets and clearing cache..."
