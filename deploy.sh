@@ -94,13 +94,23 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
         echo 'Filament Facades loaded: ' . (class_exists('Filament\\Facades\\Filament') ? '✅' : '❌') . PHP_EOL;
         echo 'AdminPanelProvider loaded: ' . (class_exists('App\\Providers\\Filament\\AdminPanelProvider') ? '✅' : '❌') . PHP_EOL;
     "
+    
+    echo "🔍 Testing Filament routes registration..."
+    php artisan route:list --path=admin | head -10 || echo "⚠️ Filament routes not found"
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
 
 # Cache config
 echo "⚡ Optimizing Laravel for production..."
+php artisan config:clear || echo "⚠️ Config clear failed"
+php artisan route:clear || echo "⚠️ Route clear failed"
+php artisan view:clear || echo "⚠️ View clear failed"
+php artisan cache:clear || echo "⚠️ Cache clear failed"
+
+# Ne pas cacher les routes en production pour Filament
 php artisan config:cache > /dev/null 2>&1
+# php artisan route:cache > /dev/null 2>&1  # Désactivé pour Filament
 php artisan view:cache > /dev/null 2>&1 || echo "⚠️ View cache failed"
 
 # Start server
