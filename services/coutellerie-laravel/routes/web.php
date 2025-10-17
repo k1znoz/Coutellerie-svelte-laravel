@@ -16,9 +16,9 @@ Route::get('/', function () {
     ]);
 });
 
-// Route login requise par Laravel/Filament
+// Route login pour Filament - affiche la vraie page de login
 Route::get('/login', function () {
-    return redirect('/admin');
+    return view('filament::login');
 })->name('login');
 
 // Toutes les autres routes sont gérées par Filament
