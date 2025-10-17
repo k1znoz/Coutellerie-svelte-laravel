@@ -89,6 +89,11 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     php artisan view:clear || echo "⚠️ View clear failed"
     php artisan config:clear || echo "⚠️ Config clear failed"
     php artisan route:clear || echo "⚠️ Route clear failed"
+    php artisan cache:clear || echo "⚠️ Cache clear failed"
+    php artisan optimize:clear || echo "⚠️ Optimize clear failed"
+    
+    echo "🔍 Listing available routes..."
+    php artisan route:list --columns=uri,method,name || echo "⚠️ Route list failed"
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
