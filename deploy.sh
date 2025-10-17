@@ -108,6 +108,17 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     
     echo "🔍 Checking if admin/login route exists specifically..."
     php artisan route:list | grep "admin/login" || echo "⚠️ admin/login route not found"
+    
+    echo "🔍 Force Filament route registration..."
+    php -r "
+        require_once 'vendor/autoload.php';
+        \$app = require_once 'bootstrap/app.php';
+        \$app->boot();
+        echo 'Filament panels loaded: ' . count(\Filament\Facades\Filament::getPanels()) . PHP_EOL;
+        foreach(\Filament\Facades\Filament::getPanels() as \$panel) {
+            echo 'Panel ID: ' . \$panel->getId() . ', Auth enabled: ' . (\$panel->hasLogin() ? 'yes' : 'no') . PHP_EOL;
+        }
+    " || echo "⚠️ Filament panel check failed"
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
