@@ -55,20 +55,27 @@ if [ -f .env.production ]; then
     echo "🔍 Before substitution - checking .env.production database section:"
     grep -E "^DB_" .env.production || echo "No DB_ variables found in .env.production"
     
-    # Use envsubst to substitute only MYSQL_PUBLIC_URL (most reliable)
-    echo "🔄 Running envsubst with MYSQL_PUBLIC_URL only..."
-    envsubst '$MYSQL_PUBLIC_URL' < .env.production > .env || exit 1
+    # Use envsubst to substitute all MySQL variables
+    echo "🔄 Running envsubst with all MySQL variables..."
+    envsubst '$MYSQL_PUBLIC_URL $MYSQLHOST $MYSQLPORT $MYSQLDATABASE $MYSQLUSER $MYSQLPASSWORD' < .env.production > .env || exit 1
     echo "✅ .env file created from .env.production with variable substitution"
 else
-    echo "⚠️ .env.production not found, creating .env with MYSQL_PUBLIC_URL..."
+    echo "⚠️ .env.production not found, creating .env with MySQL variables..."
     cat > .env << EOF
 APP_NAME="Coutellerie Svelte Laravel"
 APP_ENV=production
 APP_KEY=
 APP_DEBUG=false
-APP_URL=
+APP_URL=https://coutellerie-production.up.railway.app
 
+# Database configuration
 DB_URL=${MYSQL_PUBLIC_URL}
+DB_CONNECTION=mysql
+DB_HOST=${MYSQLHOST}
+DB_PORT=${MYSQLPORT}
+DB_DATABASE=${MYSQLDATABASE}
+DB_USERNAME=${MYSQLUSER}
+DB_PASSWORD=${MYSQLPASSWORD}
 
 SESSION_DRIVER=database
 CACHE_STORE=database
