@@ -83,6 +83,12 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     echo "🎨 Setting up Filament..."
     php artisan filament:install --panels --quiet || echo "⚠️ Filament install failed"
     php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
+    
+    echo "🔧 Publishing Filament assets and clearing cache..."
+    php artisan vendor:publish --tag=filament-assets --force || echo "⚠️ Publishing assets failed"
+    php artisan view:clear || echo "⚠️ View clear failed"
+    php artisan config:clear || echo "⚠️ Config clear failed"
+    php artisan route:clear || echo "⚠️ Route clear failed"
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
