@@ -3,35 +3,34 @@
 # Railway deployment script for Laravel - Simple approach
 echo "🚀 Railway Laravel deployment..."
 
-# Use apt packages instead of compiling (more reliable on Railway)
-echo "📦 Installing PHP MySQL extensions via apt..."
+# Install PHP extensions using docker-php-ext-install (Railway compatible)
+echo "� Installing PHP extensions for Railway..."
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq > /dev/null 2>&1
 
-# Install PHP extensions via system packages
+# Install required development libraries
 apt-get install -y -qq \
-    php8.3-mysql \
-    php8.3-pdo-mysql \
-    php8.3-mysqli \
-    php8.3-intl \
-    php8.3-zip \
-    default-mysql-client > /dev/null 2>&1
+    libicu-dev \
+    libzip-dev \
+    default-mysql-client \
+    libmysqlclient-dev > /dev/null 2>&1
 
-# Create PHP configuration to ensure extensions are loaded  
-mkdir -p /usr/local/etc/php/conf.d/
-cat > /usr/local/etc/php/conf.d/99-mysql.ini << 'EOF'
-extension=pdo_mysql
-extension=mysqli
-extension=intl
-extension=zip
-EOF
+# Use docker-php-ext-install which is Railway/Docker compatible
+echo "📦 Installing extensions via docker-php-ext-install..."
+docker-php-ext-install pdo_mysql > /dev/null 2>&1 || echo "⚠️ pdo_mysql failed"
+docker-php-ext-install mysqli > /dev/null 2>&1 || echo "⚠️ mysqli failed"  
+docker-php-ext-install intl > /dev/null 2>&1 || echo "⚠️ intl failed"
+docker-php-ext-install zip > /dev/null 2>&1 || echo "⚠️ zip failed"
 
 # Change to Laravel directory
 cd services/coutellerie-laravel || exit 1
 
-# Quick extension check
-echo "🔍 Quick extension check..."
+# Verify extensions are properly loaded
+echo "🔍 Checking PHP extensions..."
+php -r "echo 'PDO: ' . (extension_loaded('pdo') ? '✅' : '❌') . PHP_EOL;"
 php -r "echo 'PDO MySQL: ' . (extension_loaded('pdo_mysql') ? '✅' : '❌') . PHP_EOL;"
+php -r "echo 'MySQLi: ' . (extension_loaded('mysqli') ? '✅' : '❌') . PHP_EOL;"
+php -r "echo 'Available PDO drivers: ' . implode(', ', PDO::getAvailableDrivers()) . PHP_EOL;" 2>/dev/null || echo "PDO not available"
 
 # Install dependencies
 echo "📦 Installing Composer dependencies..."
