@@ -16,10 +16,10 @@ Route::get('/', function () {
     ]);
 });
 
-// Route login pour Filament - affiche la vraie page de login
-Route::get('/login', function () {
-    return view('filament::login');
-})->name('login');
+// Charger les routes d'authentification
+require __DIR__.'/auth.php';
+
+// Filament gère automatiquement l'authentification sur /admin
 
 // Toutes les autres routes sont gérées par Filament
 // Filament utilise automatiquement le préfixe /admin
