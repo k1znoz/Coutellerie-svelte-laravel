@@ -3,14 +3,29 @@
 # Railway deployment script for Laravel
 echo "🚀 Railway Laravel deployment..."
 
-# Install PHP extensions silently
+# Install PHP extensions with verification
 echo "🔧 Installing PHP extensions..."
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq > /dev/null 2>&1
-apt-get install -y -qq libicu-dev libzip-dev default-mysql-client > /dev/null 2>&1
+apt-get install -y -qq libicu-dev libzip-dev default-mysql-client libmysqlclient-dev > /dev/null 2>&1
 
-# Install required PHP extensions
-docker-php-ext-install pdo_mysql intl zip > /dev/null 2>&1 || echo "⚠️ Some extensions may already exist"
+# Install required PHP extensions one by one with verification
+echo "📦 Installing PDO and MySQL extensions..."
+docker-php-ext-install pdo || echo "⚠️ PDO installation failed"
+docker-php-ext-install pdo_mysql || echo "⚠️ PDO MySQL installation failed"
+docker-php-ext-install mysqli || echo "⚠️ MySQLi installation failed"
+docker-php-ext-install intl || echo "⚠️ Intl installation failed"
+docker-php-ext-install zip || echo "⚠️ Zip installation failed"
+
+# Verify extensions are loaded
+echo "🔍 Verifying PHP extensions..."
+php -r "echo 'PDO: ' . (extension_loaded('pdo') ? '✅' : '❌') . PHP_EOL;"
+php -r "echo 'PDO MySQL: ' . (extension_loaded('pdo_mysql') ? '✅' : '❌') . PHP_EOL;"
+php -r "echo 'MySQLi: ' . (extension_loaded('mysqli') ? '✅' : '❌') . PHP_EOL;"
+
+# Test MySQL PDO specifically
+echo "🔧 Testing MySQL PDO driver availability..."
+php -r "try { echo 'Available drivers: ' . implode(', ', PDO::getAvailableDrivers()) . PHP_EOL; } catch(Exception \$e) { echo 'PDO Error: ' . \$e->getMessage() . PHP_EOL; }"
 
 # Change to Laravel directory
 cd services/coutellerie-laravel || exit 1
@@ -46,6 +61,22 @@ if [ -z "$APP_KEY" ]; then
     APP_KEY="base64:$(openssl rand -base64 32)"
     echo "APP_KEY=$APP_KEY" >> .env
 fi
+
+# Verify database connection before migrations
+echo "🔗 Testing database connection..."
+php -r "
+try {
+    \$config = require 'config/database.php';
+    \$default = \$config['connections'][\$config['default']] ?? \$config['connections']['mysql'];
+    echo 'Database config loaded successfully' . PHP_EOL;
+    
+    if (isset(\$_ENV['DATABASE_URL']) || isset(\$_ENV['MYSQL_URL']) || isset(\$_ENV['MYSQL_PUBLIC_URL'])) {
+        echo 'Database URL found in environment' . PHP_EOL;
+    }
+} catch (Exception \$e) {
+    echo 'Config error: ' . \$e->getMessage() . PHP_EOL;
+}
+" || echo "⚠️ Database config test failed"
 
 # Run migrations
 echo "🗄️ Running migrations..."
