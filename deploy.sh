@@ -96,7 +96,8 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     php artisan route:list || echo "⚠️ Route list failed"
     
     echo "🔍 Checking Filament installation..."
-    php -r "echo 'Filament loaded: ' . (class_exists('Filament\\FilamentServiceProvider') ? '✅' : '❌') . PHP_EOL;"
+    php -r "echo 'Filament Panel loaded: ' . (class_exists('Filament\\Panel') ? '✅' : '❌') . PHP_EOL;"
+    php -r "echo 'Filament Facades loaded: ' . (class_exists('Filament\\Facades\\Filament') ? '✅' : '❌') . PHP_EOL;"
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
