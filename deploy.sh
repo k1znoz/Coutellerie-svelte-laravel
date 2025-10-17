@@ -45,8 +45,13 @@ composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scri
     composer update --no-dev --optimize-autoloader --ignore-platform-reqs --no-scripts --quiet || exit 1
 }
 
+echo "🔧 Regenerating Composer autoload..."
+composer dump-autoload --optimize --quiet
+
 # Run package discovery
-php artisan package:discover --ansi > /dev/null 2>&1 || echo "⚠️ Package discovery failed"
+echo "🔍 Running package discovery..."
+php artisan package:discover --ansi || echo "⚠️ Package discovery failed"
+php artisan config:cache --quiet || echo "⚠️ Config cache failed"
 
 # Setup environment with Railway MySQL
 echo "⚙️ Setting up environment with MySQL..."
