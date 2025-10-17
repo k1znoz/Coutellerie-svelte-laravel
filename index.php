@@ -1,4 +1,4 @@
 <?php
-// Redirection vers l'interface Filament admin
-header('Location: /services/coutellerie-laravel/public/admin');
+// Redirection vers l'interface Filament admin avec le bon chemin
+header('Location: /services/coutellerie-laravel/public/admin/login');
 exit;

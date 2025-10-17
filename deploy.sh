@@ -53,6 +53,9 @@ echo "🔍 Running package discovery..."
 php artisan package:discover --ansi || echo "⚠️ Package discovery failed"
 php artisan config:cache --quiet || echo "⚠️ Config cache failed"
 
+echo "🚀 Bootstrapping Laravel application..."
+php artisan about --only=environment || echo "⚠️ Laravel bootstrap check failed"
+
 # Setup environment with Railway MySQL
 echo "⚙️ Setting up environment with MySQL..."
 if [ -f .env.production ]; then
@@ -101,8 +104,12 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     php artisan route:list || echo "⚠️ Route list failed"
     
     echo "🔍 Checking Filament installation..."
-    php -r "echo 'Filament Panel loaded: ' . (class_exists('Filament\\Panel') ? '✅' : '❌') . PHP_EOL;"
-    php -r "echo 'Filament Facades loaded: ' . (class_exists('Filament\\Facades\\Filament') ? '✅' : '❌') . PHP_EOL;"
+    php -r "
+        require_once 'vendor/autoload.php';
+        echo 'Filament Panel loaded: ' . (class_exists('Filament\\Panel') ? '✅' : '❌') . PHP_EOL;
+        echo 'Filament Facades loaded: ' . (class_exists('Filament\\Facades\\Filament') ? '✅' : '❌') . PHP_EOL;
+        echo 'AdminPanelProvider loaded: ' . (class_exists('App\\Providers\\Filament\\AdminPanelProvider') ? '✅' : '❌') . PHP_EOL;
+    "
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
