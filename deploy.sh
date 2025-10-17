@@ -15,9 +15,19 @@ apt-get install -y -qq \
     default-mysql-client \
     libmysqlclient-dev > /dev/null 2>&1
 
-# Skip MySQL extensions for now - use SQLite to get app running
-echo "📦 Using SQLite temporarily to bypass MySQL extension issues..."
-# We'll fix MySQL later, but this gets the app running immediately
+# Try to get MySQL extensions working
+echo "🔧 Attempting to install MySQL extensions..."
+
+# Method 1: Try system packages first
+apt-get install -y -qq php-mysql php-pdo-mysql > /dev/null 2>&1 || echo "System packages failed"
+
+# Method 2: Enable any existing extensions
+echo "extension=pdo_mysql" > /usr/local/etc/php/conf.d/pdo_mysql.ini || true
+echo "extension=mysqli" > /usr/local/etc/php/conf.d/mysqli.ini || true
+
+# Method 3: Last resort - try compilation with minimal deps
+docker-php-ext-install pdo_mysql > /dev/null 2>&1 || echo "pdo_mysql compilation failed"
+docker-php-ext-install mysqli > /dev/null 2>&1 || echo "mysqli compilation failed"
 
 # Change to Laravel directory
 cd services/coutellerie-laravel || exit 1
@@ -38,37 +48,25 @@ composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scri
 # Run package discovery
 php artisan package:discover --ansi > /dev/null 2>&1 || echo "⚠️ Package discovery failed"
 
-# Setup environment with SQLite for immediate deployment
-echo "⚙️ Setting up environment with SQLite..."
+# Setup environment with Railway MySQL
+echo "⚙️ Setting up environment with MySQL..."
 if [ -f .env.production ]; then
     cp .env.production .env
+    
+    # Substitute Railway MySQL variables
+    echo "🔄 Substituting Railway MySQL variables..."
+    sed -i "s/\${MYSQLHOST}/$MYSQLHOST/g" .env
+    sed -i "s/\${MYSQLPORT}/$MYSQLPORT/g" .env  
+    sed -i "s/\${MYSQLDATABASE}/$MYSQLDATABASE/g" .env
+    sed -i "s/\${MYSQLUSER}/$MYSQLUSER/g" .env
+    sed -i "s/\${MYSQLPASSWORD}/$MYSQLPASSWORD/g" .env
+    sed -i "s/\${MYSQL_URL}/$MYSQL_URL/g" .env
+    
+    echo "✅ MySQL configuration updated"
 else
-    # Create basic .env if not found
-    cat > .env << 'EOF'
-APP_NAME="Coutellerie Svelte Laravel"
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://coutellerie-production.up.railway.app
-EOF
+    echo "❌ .env.production not found!"
+    exit 1
 fi
-
-# Override database config to use SQLite temporarily
-cat >> .env << 'EOF'
-
-# Temporary SQLite database (to get app running)
-DB_CONNECTION=sqlite
-DB_DATABASE=/app/database/database.sqlite
-
-SESSION_DRIVER=database
-CACHE_STORE=database
-QUEUE_CONNECTION=database
-LOG_CHANNEL=stderr
-LOG_LEVEL=info
-EOF
-
-# Create SQLite database
-mkdir -p /app/database
-touch /app/database/database.sqlite
 
 # Generate app key
 if [ -z "$APP_KEY" ]; then
