@@ -38,6 +38,27 @@ Route::get('/login', function () {
     return redirect('/admin/login');
 });
 
+// Test simple pour isoler le problème Filament
+Route::get('/test-filament', function () {
+    try {
+        $panels = \Filament\Facades\Filament::getPanels();
+        $adminPanel = $panels['admin'] ?? null;
+        
+        return response()->json([
+            'panel_exists' => $adminPanel !== null,
+            'panel_path' => $adminPanel ? $adminPanel->getPath() : null,
+            'panel_login' => $adminPanel ? $adminPanel->hasLogin() : null,
+            'session_driver' => config('session.driver'),
+            'app_key_set' => !empty(config('app.key')),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Route de debug temporaire pour vérifier Filament
 Route::get('/debug-filament', function () {
     $panels = \Filament\Facades\Filament::getPanels();

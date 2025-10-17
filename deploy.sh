@@ -78,12 +78,13 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     echo "📦 Publishing Filament auth views and resources..."
     php artisan vendor:publish --tag=filament-config --force || echo "⚠️ Filament config publish failed"
     php artisan vendor:publish --tag=filament-views --force || echo "⚠️ Filament views publish failed"
+    php artisan vendor:publish --tag=filament-panels --force || echo "⚠️ Filament panels publish failed"
     
-    echo "🔄 Force Filament panel discovery..."
+    echo "🎨 Compiling Filament assets..."
+    php artisan filament:assets --force || echo "⚠️ Filament assets failed"
+    
+    echo "� Force Filament panel discovery..."
     php artisan filament:clear-cached-components || echo "⚠️ Clear components failed"
-    
-    echo "🔑 Force generation of Filament auth pages..."
-    php artisan make:filament-page Auth/Login --type=simple || echo "⚠️ Auth page creation failed"
     
     php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
     
