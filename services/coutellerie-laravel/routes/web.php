@@ -16,7 +16,10 @@ Route::get('/', function () {
     ]);
 });
 
-// Login géré directement par Filament sur /admin
+// Route login requise par Laravel/Filament
+Route::get('/login', function () {
+    return redirect('/admin');
+})->name('login');
 
 // Toutes les autres routes sont gérées par Filament
 // Filament utilise automatiquement le préfixe /admin
