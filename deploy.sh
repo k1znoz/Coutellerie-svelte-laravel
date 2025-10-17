@@ -86,11 +86,16 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     
     echo "🔧 Publishing Filament assets and clearing cache..."
     php artisan vendor:publish --tag=filament-assets --force || echo "⚠️ Publishing assets failed"
-    php artisan view:clear || echo "⚠️ View clear failed"
+    
+    echo "🧹 Clearing ALL caches for clean state..."
+    php artisan optimize:clear || echo "⚠️ Optimize clear failed"
+    php artisan view:clear || echo "⚠️ View clear failed" 
     php artisan config:clear || echo "⚠️ Config clear failed"
     php artisan route:clear || echo "⚠️ Route clear failed"
     php artisan cache:clear || echo "⚠️ Cache clear failed"
-    php artisan optimize:clear || echo "⚠️ Optimize clear failed"
+    
+    echo "🔄 Regenerating autoload..."
+    composer dump-autoload --optimize --quiet
     
     echo "🔍 Listing available routes..."
     php artisan route:list || echo "⚠️ Route list failed"
@@ -109,16 +114,8 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     echo "🔍 Checking if admin/login route exists specifically..."
     php artisan route:list | grep "admin/login" || echo "⚠️ admin/login route not found"
     
-    echo "🔍 Force Filament route registration..."
-    php -r "
-        require_once 'vendor/autoload.php';
-        \$app = require_once 'bootstrap/app.php';
-        \$app->boot();
-        echo 'Filament panels loaded: ' . count(\Filament\Facades\Filament::getPanels()) . PHP_EOL;
-        foreach(\Filament\Facades\Filament::getPanels() as \$panel) {
-            echo 'Panel ID: ' . \$panel->getId() . ', Auth enabled: ' . (\$panel->hasLogin() ? 'yes' : 'no') . PHP_EOL;
-        }
-    " || echo "⚠️ Filament panel check failed"
+    echo "🔍 Checking Filament panels via artisan..."
+    php artisan about | grep -i filament || echo "⚠️ Filament not detected in artisan about"
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
