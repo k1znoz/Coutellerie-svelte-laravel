@@ -1,0 +1,87 @@
+{{
+
+    "name": "coutellerie/laravel-api",    "name": "coutellerie/monorepo",
+
+    "type": "project",    "description": "Monorepo Coutellerie - Laravel API Backend",
+
+    "description": "Coutellerie Laravel API Backend",    "type": "project",
+
+    "keywords": ["laravel", "framework", "api", "coutellerie"],    "require": {
+
+    "license": "MIT",        "php": "^8.3"
+
+    "require": {    },
+
+        "php": "^8.3",    "scripts": {
+
+        "laravel/framework": "^11.9",        "post-install-cmd": [
+
+        "laravel/sanctum": "^4.0",            "cd services/coutellerie-laravel && composer install --no-dev --optimize-autoloader"
+
+        "laravel/tinker": "^2.9",        ],
+
+        "filament/filament": "^3.0",        "start": [
+
+        "illuminate/support": "^11.0"            "cd services/coutellerie-laravel && php artisan serve --host=0.0.0.0 --port=$PORT"
+
+    },        ]
+
+    "require-dev": {    },
+
+        "fakerphp/faker": "^1.23",    "config": {
+
+        "laravel/pint": "^1.13",        "optimize-autoloader": true,
+
+        "mockery/mockery": "^1.6",        "preferred-install": "dist",
+
+        "nunomaduro/collision": "^8.0",        "sort-packages": true
+
+        "phpunit/phpunit": "^11.0.1"    }
+
+    },}
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi",
+            "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+            "@php artisan migrate --graceful --ansi"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
