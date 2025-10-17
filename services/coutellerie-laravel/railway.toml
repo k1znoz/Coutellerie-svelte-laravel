@@ -1,12 +1,13 @@
 [build]
 # Use Railway's automatic PHP/Laravel detection
-builder = "Railpack"
+builder = "nixpacks"
 
 [deploy]
-# Use Procfile for start command  
+# Use built-in Laravel commands
+startCommand = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
 restartPolicyType = "ON_FAILURE"
 
 # Environment variables
 [env]
-# Force PHP version to latest supported
+# Force PHP version
 PHP_VERSION = "8.3"

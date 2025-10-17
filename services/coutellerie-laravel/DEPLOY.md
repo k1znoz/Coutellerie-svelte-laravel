@@ -1,4 +1,4 @@
-# 🚀 Déploiement Railway - SIMPLE
+# 🚀 Déploiement Railway - AUTOMATIQUE
 
 ## Configuration Railway
 
@@ -18,9 +18,11 @@ DB_PASSWORD=${{MYSQLPASSWORD}}
 
 ## C'est tout !
 
-Railway détecte automatiquement Laravel et utilise nos fichiers :
-- `Procfile` → Lance `deploy.sh`
-- `deploy.sh` → Install + migrate + démarre
-- `railway.toml` → Config Railway
+Railway fait TOUT automatiquement :
+- ✅ Détecte Laravel
+- ✅ Installe PHP 8.3 et Composer
+- ✅ Lance `composer install`
+- ✅ Exécute `php artisan migrate --force`
+- ✅ Démarre le serveur Laravel
 
-✅ **Structure optimisée pour Railway !**
+**Aucun script personnalisé nécessaire !**
