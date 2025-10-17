@@ -101,6 +101,10 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     echo "🔄 Regenerating autoload..."
     composer dump-autoload --optimize --quiet
     
+    echo "🎨 Building Filament assets from scratch..."
+    npm install || echo "⚠️ NPM install failed"
+    npm run build || echo "⚠️ NPM build failed"
+    
     echo "🔍 Listing available routes..."
     php artisan route:list || echo "⚠️ Route list failed"
     
