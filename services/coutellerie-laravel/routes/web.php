@@ -38,5 +38,27 @@ Route::get('/login', function () {
     return redirect('/admin/login');
 });
 
+// Route de debug temporaire pour vérifier Filament
+Route::get('/debug-filament', function () {
+    $panels = \Filament\Facades\Filament::getPanels();
+    $routes = collect(Route::getRoutes())->filter(function ($route) {
+        return str_contains($route->uri(), 'admin');
+    })->map(function ($route) {
+        return [
+            'uri' => $route->uri(),
+            'methods' => $route->methods(),
+            'name' => $route->getName(),
+        ];
+    });
+    
+    return response()->json([
+        'panels_count' => count($panels),
+        'panels' => array_keys($panels),
+        'admin_routes' => $routes,
+        'filament_installed' => class_exists(\Filament\Panel::class),
+        'provider_exists' => class_exists(\App\Providers\Filament\AdminPanelProvider::class),
+    ]);
+});
+
 // Toutes les autres routes sont gérées par Filament
 // Filament utilise automatiquement le préfixe /admin

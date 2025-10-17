@@ -79,6 +79,9 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     php artisan vendor:publish --tag=filament-config --force || echo "⚠️ Filament config publish failed"
     php artisan vendor:publish --tag=filament-views --force || echo "⚠️ Filament views publish failed"
     
+    echo "🔄 Force Filament panel discovery..."
+    php artisan filament:clear-cached-components || echo "⚠️ Clear components failed"
+    
     php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
     
     echo "🔧 Publishing Filament assets and clearing cache..."
@@ -101,7 +104,10 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     "
     
     echo "🔍 Testing Filament routes registration..."
-    php artisan route:list --path=admin | head -10 || echo "⚠️ Filament routes not found"
+    php artisan route:list --path=admin || echo "⚠️ Filament routes not found"
+    
+    echo "🔍 Checking if admin/login route exists specifically..."
+    php artisan route:list | grep "admin/login" || echo "⚠️ admin/login route not found"
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
