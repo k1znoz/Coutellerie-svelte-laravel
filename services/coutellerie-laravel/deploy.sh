@@ -2,10 +2,7 @@
 
 echo "🚀 Déploiement Railway..."
 
-# Aller dans le dossier Laravel
-cd services/coutellerie-laravel
-
-# Installer les dépendances
+# Installer les dépendances Laravel
 composer install --no-dev --optimize-autoloader
 
 # Migrer la base de données

@@ -10,5 +10,3 @@ restartPolicyType = "ON_FAILURE"
 [env]
 # Force PHP version to latest supported
 PHP_VERSION = "8.3"
-# Laravel specific variables will be set in Railway dashboard  
-# MySQL variables will be automatically provided by Railway MySQL service

@@ -1,6 +1,10 @@
 # 🚀 Déploiement Railway - SIMPLE
 
-## Variables à configurer dans Railway
+## Configuration Railway
+
+1. **Root Directory** : `services/coutellerie-laravel`
+2. **Service MySQL** : Activé
+3. **Variables** à configurer :
 
 ```env
 APP_KEY=base64:YOUR_APP_KEY_HERE
@@ -14,13 +18,9 @@ DB_PASSWORD=${{MYSQLPASSWORD}}
 
 ## C'est tout !
 
-1. Connectez votre repo GitHub à Railway
-2. Ajoutez le service MySQL
-3. Configurez les variables ci-dessus
-4. Railway fait le reste automatiquement
-
-## Fichiers de déploiement
-
+Railway détecte automatiquement Laravel et utilise nos fichiers :
 - `Procfile` → Lance `deploy.sh`
-- `deploy.sh` → Install + migrate + démarre le serveur
+- `deploy.sh` → Install + migrate + démarre
 - `railway.toml` → Config Railway
+
+✅ **Structure optimisée pour Railway !**
