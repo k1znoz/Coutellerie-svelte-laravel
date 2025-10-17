@@ -18,11 +18,12 @@ DB_PASSWORD=${{MYSQLPASSWORD}}
 
 ## C'est tout !
 
-Railway fait TOUT automatiquement :
-- ✅ Détecte Laravel
-- ✅ Installe PHP 8.3 et Composer
-- ✅ Lance `composer install`
-- ✅ Exécute `php artisan migrate --force`
-- ✅ Démarre le serveur Laravel
+Railway avec Nixpacks fait TOUT automatiquement :
 
-**Aucun script personnalisé nécessaire !**
+-   ✅ Force PHP 8.3 (via `.nixpacks.toml`)
+-   ✅ Installe Composer automatiquement
+-   ✅ Lance `composer install --no-dev --optimize-autoloader`
+-   ✅ Exécute `php artisan migrate --force`
+-   ✅ Démarre le serveur Laravel
+
+**Configuration :** `.nixpacks.toml` force la détection PHP
