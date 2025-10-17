@@ -62,15 +62,16 @@ if [ -f .env.production ]; then
     cp .env.production .env
     
     # Replace database URL with the best available option
+    # Priority: Private network URLs work better than public proxy URLs in Railway
     if [ -n "$DATABASE_URL" ]; then
-        echo "✅ Using DATABASE_URL: ${DATABASE_URL:0:50}..."
+        echo "✅ Using DATABASE_URL (Railway standard): ${DATABASE_URL:0:50}..."
         sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}|$DATABASE_URL|g" .env
-    elif [ -n "$MYSQL_PUBLIC_URL" ]; then
-        echo "✅ Using MYSQL_PUBLIC_URL: ${MYSQL_PUBLIC_URL:0:50}..."
-        sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}|$MYSQL_PUBLIC_URL|g" .env
     elif [ -n "$MYSQL_URL" ]; then
-        echo "✅ Using MYSQL_URL: ${MYSQL_URL:0:50}..."
+        echo "✅ Using MYSQL_URL (private network): ${MYSQL_URL:0:50}..."
         sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}|$MYSQL_URL|g" .env
+    elif [ -n "$MYSQL_PUBLIC_URL" ]; then
+        echo "✅ Using MYSQL_PUBLIC_URL (public proxy): ${MYSQL_PUBLIC_URL:0:50}..."
+        sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}|$MYSQL_PUBLIC_URL|g" .env
     else
         echo "❌ No database URL found! Using fallback configuration..."
         sed -i "s|\${DATABASE_URL:-\${MYSQL_PUBLIC_URL}}||g" .env
@@ -113,6 +114,13 @@ echo "🔍 Railway environment variables:"
 echo "MYSQL_PUBLIC_URL available: ${MYSQL_PUBLIC_URL:+YES}"
 echo "MYSQL_URL available: ${MYSQL_URL:+YES}"
 echo "DATABASE_URL available: ${DATABASE_URL:+YES}"
+echo "PORT variable: ${PORT:-'NOT_SET'}"
+
+# Show actual URLs for debugging (first 60 chars only for security)
+echo "🔍 Database URLs available:"
+[ -n "$DATABASE_URL" ] && echo "DATABASE_URL: ${DATABASE_URL:0:60}..."
+[ -n "$MYSQL_URL" ] && echo "MYSQL_URL: ${MYSQL_URL:0:60}..."
+[ -n "$MYSQL_PUBLIC_URL" ] && echo "MYSQL_PUBLIC_URL: ${MYSQL_PUBLIC_URL:0:60}..."
 
 # Test different possible variable names
 echo "🔍 Testing variable name variations:"
@@ -219,5 +227,6 @@ echo "⚡ Caching configurations..."
 php artisan config:cache || echo "⚠️ Config cache failed, continuing..."
 
 # Start the Laravel server
-echo "🌟 Starting Laravel server on port $PORT..."
+echo "🌟 Starting Laravel server on port ${PORT:-8000}..."
+echo "🔍 PORT environment variable: ${PORT:-'NOT_SET'}"
 php artisan serve --host=0.0.0.0 --port="${PORT:-8000}"
