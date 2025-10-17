@@ -69,7 +69,10 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     echo "🗄️ Running migrations..."
     php artisan migrate --force || echo "⚠️ Migrations failed"
     
-    echo "🎨 Setting up Filament..."
+    echo "� Running seeders..."
+    php artisan db:seed --force || echo "⚠️ Seeders failed"
+    
+    echo "� Setting up Filament..."
     php artisan filament:install --panels --force --quiet || echo "⚠️ Filament install failed"
     php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
     
