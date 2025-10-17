@@ -15,11 +15,3 @@ Route::get('/', function () {
         ]
     ]);
 });
-
-// Route login standard de Laravel
-Route::get('/login', function () {
-    return view('auth.login'); // Vue login Laravel standard
-})->name('login');
-
-// Toutes les autres routes sont gérées par Filament
-// Filament utilise automatiquement le préfixe /admin
