@@ -128,6 +128,9 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     php artisan vendor:publish --tag=filament-assets --force || echo "⚠️ Publishing assets failed"
     php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
     
+    echo "🔗 Creating storage symlink..."
+    php artisan storage:link || echo "⚠️ Storage link failed"
+    
     echo "🧹 Clearing all caches..."
     php artisan view:clear || echo "⚠️ View clear failed"
     php artisan config:clear || echo "⚠️ Config clear failed"
