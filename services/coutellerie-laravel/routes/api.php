@@ -14,6 +14,30 @@ Route::get('/health', function () {
     ]);
 });
 
+// Route de debug pour vérifier la configuration CORS et headers
+Route::get('/debug', function (Request $request) {
+    return response()->json([
+        'status' => 'Debug API',
+        'headers' => [
+            'origin' => $request->header('Origin'),
+            'user-agent' => $request->header('User-Agent'),
+            'host' => $request->header('Host'),
+            'referer' => $request->header('Referer'),
+        ],
+        'cors_config' => [
+            'allowed_origins' => config('cors.allowed_origins'),
+            'allowed_headers' => config('cors.allowed_headers'),
+        ],
+        'sanctum_config' => [
+            'stateful_domains' => config('sanctum.stateful'),
+        ],
+        'environment' => [
+            'app_url' => env('APP_URL'),
+            'frontend_url' => env('FRONTEND_URL'),
+        ],
+    ]);
+});
+
 // Routes API pour les couteaux
 Route::prefix('knives')->group(function () {
     Route::get('/', [KnifeController::class, 'index']);

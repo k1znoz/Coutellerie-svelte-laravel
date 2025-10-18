@@ -15,7 +15,13 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'images/*', 'admin/*'],
+    'paths' => [
+        'api/*', 
+        'sanctum/csrf-cookie', 
+        'images/*', 
+        'admin/*',
+        'storage/*'
+    ],
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
@@ -24,10 +30,14 @@ return [
         'http://localhost:5173',
         'http://localhost:3000', 
         'http://localhost:4173',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:3000',
         // Production Railway Backend
         env('APP_URL', 'https://coutellerie-production.up.railway.app'),
-        // Production Frontend Vercel
+        // Production Frontend (SvelteKit peut être sur différents services)
         env('FRONTEND_URL', 'https://coutellerie-frontend.vercel.app'),
+        // Autoriser Railway temporairement pour debug
+        '*', // À retirer en production finale
     ],
 
     'allowed_origins_patterns' => [
@@ -39,9 +49,13 @@ return [
         'Accept',
         'Authorization',
         'Content-Type',
+        'Origin',
         'X-Requested-With',
         'X-CSRF-TOKEN',
         'X-XSRF-TOKEN',
+        'Cache-Control',
+        'Pragma',
+        'Expires',
     ],
 
     'exposed_headers' => ['X-Pagination-Total', 'X-Pagination-Per-Page'],
