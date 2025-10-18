@@ -37,7 +37,8 @@ return [
         // Production Frontend (SvelteKit peut être sur différents services)
         env('FRONTEND_URL', 'https://coutellerie-frontend.vercel.app'),
         // Autoriser Railway temporairement pour debug
-        '*', // À retirer en production finale
+        'https://coutellerie-production.up.railway.app',
+        'https://coutellerie-frontend.vercel.app',
     ],
 
     'allowed_origins_patterns' => [
