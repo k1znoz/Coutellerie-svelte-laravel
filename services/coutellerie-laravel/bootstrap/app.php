@@ -15,7 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class => \App\Http\Middleware\VerifyCsrfToken::class,
         ]);
     })
+    ->withExceptions(function ($exceptions) {
+        //
+    })
     ->withProviders([
+        // Enregistrer les providers essentiels
+        \App\Providers\AppServiceProvider::class,
         // Enregistrer le fournisseur de panneau d'administration Filament
         \App\Providers\Filament\AdminPanelProvider::class,
     ])
