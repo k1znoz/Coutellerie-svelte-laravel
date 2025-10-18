@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Route par défaut - Page d'accueil simple
+// Route par défaut - Redirection vers l'interface d'administration Filament
 Route::get('/', function () {
-    return view('/admin');
+    return redirect('/admin');
 });
 
 // Route API info (accessible via /api-info)
