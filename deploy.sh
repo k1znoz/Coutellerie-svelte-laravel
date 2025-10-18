@@ -56,8 +56,6 @@ php artisan config:cache --quiet || echo "⚠️ Config cache failed"
 echo "🚀 Bootstrapping Laravel application..."
 php artisan about --only=environment || echo "⚠️ Laravel bootstrap check failed"
 
-# Setup environment with Railway MySQL
-echo "⚙️ Setting up environment with MySQL..."
 
 
 # Test database connection before migrations

@@ -2,8 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Route par défaut pour l'API
+// Route par défaut - Page d'accueil simple
 Route::get('/', function () {
+    return view('welcome');
+});
+
+// Route API info (accessible via /api-info)
+Route::get('/api-info', function () {
     return response()->json([
         'message' => 'Coutellerie Laravel API',
         'version' => '1.0.0',
@@ -15,6 +20,3 @@ Route::get('/', function () {
     ]);
 });
 
-
-// Toutes les autres routes sont gérées par Filament
-// Filament utilise automatiquement le préfixe /admin
