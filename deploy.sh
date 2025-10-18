@@ -8,12 +8,40 @@ echo "� Installing PHP extensions for Railway..."
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq > /dev/null 2>&1
 
-# Install required development libraries
+# Install required development libraries and Node.js
 apt-get install -y -qq \
     libicu-dev \
     libzip-dev \
     default-mysql-client \
-    libmysqlclient-dev > /dev/null 2>&1
+    libmysqlclient-dev \
+    curl \
+    wget \
+    gnupg > /dev/null 2>&1
+
+# Install Node.js 18 LTS for Railpack environment
+echo "📦 Installing Node.js for Railway/Railpack..."
+# Method 1: Try NodeSource repository
+curl -fsSL https://deb.nodesource.com/setup_18.x | bash - > /dev/null 2>&1 && \
+apt-get install -y nodejs > /dev/null 2>&1
+
+# Method 2: Fallback - download binary directly if repository method fails
+if ! command -v node >/dev/null 2>&1; then
+    echo "🔄 Trying direct Node.js installation..."
+    cd /tmp
+    wget -q https://nodejs.org/dist/v18.18.2/node-v18.18.2-linux-x64.tar.xz
+    tar -xf node-v18.18.2-linux-x64.tar.xz
+    cp -r node-v18.18.2-linux-x64/* /usr/local/
+    cd /app/services/coutellerie-laravel
+fi
+
+# Verify Node.js installation
+echo "🔍 Checking Node.js installation..."
+if command -v node >/dev/null 2>&1; then
+    echo "Node.js version: $(node --version) ✅"
+    echo "npm version: $(npm --version) ✅"
+else
+    echo "❌ Node.js installation failed"
+fi
 
 # Try to get MySQL extensions working
 echo "🔧 Attempting to install MySQL extensions..."
@@ -50,13 +78,32 @@ composer dump-autoload --optimize --quiet
 
 # Install Node.js dependencies and build assets
 echo "📦 Installing Node.js dependencies..."
-npm ci --production=false --silent || {
-    echo "⚠️ npm ci failed, trying npm install..."
-    npm install --silent || echo "❌ npm install failed"
-}
-
-echo "🏗️ Building frontend assets..."
-npm run build || echo "⚠️ Asset build failed"
+if command -v npm >/dev/null 2>&1; then
+    echo "npm available, proceeding with installation..."
+    npm ci --production=false --silent || {
+        echo "⚠️ npm ci failed, trying npm install..."
+        npm install --silent || echo "❌ npm install failed"
+    }
+    
+    echo "🏗️ Building frontend assets..."
+    if npm run build; then
+        echo "✅ Asset build successful"
+        # Verify build output
+        if [ -d "public/build" ]; then
+            echo "✅ Vite build directory created"
+            ls -la public/build/ | head -5
+        fi
+    else
+        echo "⚠️ Asset build failed - trying without cache"
+        rm -rf node_modules/.cache 2>/dev/null
+        npm run build || echo "❌ Asset build failed completely"
+    fi
+else
+    echo "❌ npm not available, skipping asset build"
+    echo "🔧 Creating empty build directory for compatibility..."
+    mkdir -p public/build
+    echo "/* Fallback CSS */" > public/build/app.css
+fi
 
 # Run package discovery
 echo "🔍 Running package discovery..."
