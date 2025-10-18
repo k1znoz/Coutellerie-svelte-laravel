@@ -59,43 +59,43 @@ php artisan about --only=environment || echo "⚠️ Laravel bootstrap check fai
 # Setup environment with Railway MySQL
 echo "⚙️ Setting up environment with MySQL..."
 
-# Create .env from environment variables directly
-echo "🔄 Creating .env with Railway variables..."
-cat > .env << EOF
-APP_NAME=Laravel
-APP_ENV=production
-APP_KEY=${APP_KEY}
-APP_DEBUG=false
-APP_URL=${APP_URL}
+# # Create .env from environment variables directly
+# echo "🔄 Creating .env with Railway variables..."
+# cat > .env << EOF
+# APP_NAME=Laravel
+# APP_ENV=production
+# APP_KEY=${APP_KEY}
+# APP_DEBUG=false
+# APP_URL=${APP_URL}
 
-LOG_CHANNEL=stack
+# LOG_CHANNEL=stack
 
-DB_CONNECTION=mysql
-DB_HOST=${MYSQLHOST}
-DB_PORT=${MYSQLPORT}
-DB_DATABASE=${MYSQLDATABASE}
-DB_USERNAME=${MYSQLUSER}
-DB_PASSWORD=${MYSQLPASSWORD}
+# DB_CONNECTION=mysql
+# DB_HOST=${MYSQLHOST}
+# DB_PORT=${MYSQLPORT}
+# DB_DATABASE=${MYSQLDATABASE}
+# DB_USERNAME=${MYSQLUSER}
+# DB_PASSWORD=${MYSQLPASSWORD}
 
-BROADCAST_DRIVER=log
-CACHE_DRIVER=file
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=file
-SESSION_LIFETIME=120
+# BROADCAST_DRIVER=log
+# CACHE_DRIVER=file
+# QUEUE_CONNECTION=sync
+# SESSION_DRIVER=file
+# SESSION_LIFETIME=120
 
-MAIL_MAILER=smtp
-MAIL_HOST=mailhog
-MAIL_PORT=1025
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS=null
-MAIL_FROM_NAME="\${APP_NAME}"
+# MAIL_MAILER=smtp
+# MAIL_HOST=mailhog
+# MAIL_PORT=1025
+# MAIL_USERNAME=null
+# MAIL_PASSWORD=null
+# MAIL_ENCRYPTION=null
+# MAIL_FROM_ADDRESS=null
+# MAIL_FROM_NAME="\${APP_NAME}"
 
-SANCTUM_STATEFUL_DOMAINS=localhost,127.0.0.1,127.0.0.1:3000,::1,\${APP_URL}
-EOF
+# SANCTUM_STATEFUL_DOMAINS=localhost,127.0.0.1,127.0.0.1:3000,::1,\${APP_URL}
+# EOF
 
-echo "✅ MySQL configuration updated"
+# echo "✅ MySQL configuration updated"
 
 # Test database connection before migrations
 echo "🔗 Testing database connection..."
