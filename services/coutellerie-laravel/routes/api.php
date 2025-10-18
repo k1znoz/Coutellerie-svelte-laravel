@@ -14,8 +14,6 @@ Route::get('/health', function () {
     ]);
 });
 
-
-
 // Routes API pour les couteaux
 Route::prefix('knives')->group(function () {
     Route::get('/', [KnifeController::class, 'index']);
@@ -27,13 +25,6 @@ Route::prefix('knives')->group(function () {
 Route::post('/contact', [ContactController::class, 'store'])
     ->withoutMiddleware(['csrf'])
     ->middleware('throttle:5,1'); // 5 tentatives par minute
-
-// Routes d'authentification (à implémenter si nécessaire)
-Route::prefix('auth')->group(function () {
-    // Route::post('/login', [AuthController::class, 'login']);
-    // Route::post('/refresh', [AuthController::class, 'refresh']);  
-    // Route::post('/verify', [AuthController::class, 'verify']);
-});
 
 // Routes protégées
 Route::middleware('auth:sanctum')->group(function () {
