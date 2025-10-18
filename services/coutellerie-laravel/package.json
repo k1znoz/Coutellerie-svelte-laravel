@@ -2,6 +2,7 @@
   "name": "coutellerie-laravel",
   "version": "1.0.0",
   "description": "Coutellerie Laravel Backend",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
