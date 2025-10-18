@@ -48,6 +48,16 @@ composer install --no-dev --optimize-autoloader --ignore-platform-reqs --no-scri
 echo "🔧 Regenerating Composer autoload..."
 composer dump-autoload --optimize --quiet
 
+# Install Node.js dependencies and build assets
+echo "📦 Installing Node.js dependencies..."
+npm ci --production=false --silent || {
+    echo "⚠️ npm ci failed, trying npm install..."
+    npm install --silent || echo "❌ npm install failed"
+}
+
+echo "🏗️ Building frontend assets..."
+npm run build || echo "⚠️ Asset build failed"
+
 # Run package discovery
 echo "🔍 Running package discovery..."
 php artisan package:discover --ansi || echo "⚠️ Package discovery failed"
@@ -66,10 +76,12 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     
     echo "🎨 Setting up Filament..."
     php artisan filament:install --panels --force --quiet || echo "⚠️ Filament install failed"
+    
+    echo "🔧 Publishing and optimizing Filament assets..."
+    php artisan vendor:publish --tag=filament-assets --force || echo "⚠️ Publishing assets failed"
     php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
     
-    echo "🔧 Publishing Filament assets and clearing cache..."
-    php artisan vendor:publish --tag=filament-assets --force || echo "⚠️ Publishing assets failed"
+    echo "🧹 Clearing all caches..."
     php artisan view:clear || echo "⚠️ View clear failed"
     php artisan config:clear || echo "⚠️ Config clear failed"
     php artisan route:clear || echo "⚠️ Route clear failed"
@@ -86,6 +98,20 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
         echo 'Filament Facades loaded: ' . (class_exists('Filament\\Facades\\Filament') ? '✅' : '❌') . PHP_EOL;
         echo 'AdminPanelProvider loaded: ' . (class_exists('App\\Providers\\Filament\\AdminPanelProvider') ? '✅' : '❌') . PHP_EOL;
     "
+    
+    echo "🎨 Checking compiled assets..."
+    if [ -d "public/build" ]; then
+        echo "Vite build directory: ✅"
+        ls -la public/build/ || echo "Build directory empty"
+    else
+        echo "Vite build directory: ❌"
+    fi
+    
+    if [ -d "public/vendor/filament" ]; then
+        echo "Filament assets: ✅"
+    else
+        echo "Filament assets: ❌"
+    fi
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
