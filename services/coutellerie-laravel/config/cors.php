@@ -15,19 +15,38 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'images/*'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'images/*', 'admin/*'],
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:4173'],
+    'allowed_origins' => [
+        // Développement local
+        'http://localhost:5173',
+        'http://localhost:3000', 
+        'http://localhost:4173',
+        // Production
+        'https://coutellerie-production.up.railway.app',
+        // Ajoutez l'URL de votre app Svelte en production
+        env('FRONTEND_URL', 'https://coutellerie-frontend.vercel.app/'),
+    ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '/^https:\/\/.*\.railway\.app$/',
+        '/^https:\/\/.*\.vercel\.app$/',
+    ],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => [
+        'Accept',
+        'Authorization',
+        'Content-Type',
+        'X-Requested-With',
+        'X-CSRF-TOKEN',
+        'X-XSRF-TOKEN',
+    ],
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['X-Pagination-Total', 'X-Pagination-Per-Page'],
 
-    'max_age' => 0,
+    'max_age' => 86400, // 24 heures
 
     'supports_credentials' => true,
 

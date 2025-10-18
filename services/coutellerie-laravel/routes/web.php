@@ -7,6 +7,11 @@ Route::get('/', function () {
     return redirect('/admin');
 });
 
+// Route login - Redirection vers l'authentification Filament
+Route::get('/login', function () {
+    return redirect('/admin');
+});
+
 // Route API info (accessible via /api-info)
 Route::get('/api-info', function () {
     return response()->json([
