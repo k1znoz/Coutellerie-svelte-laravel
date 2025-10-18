@@ -24,10 +24,10 @@ return [
         'http://localhost:5173',
         'http://localhost:3000', 
         'http://localhost:4173',
-        // Production
-        'https://coutellerie-production.up.railway.app',
-        // Ajoutez l'URL de votre app Svelte en production
-        env('FRONTEND_URL', 'https://coutellerie-frontend.vercel.app/'),
+        // Production Railway Backend
+        env('APP_URL', 'https://coutellerie-production.up.railway.app'),
+        // Production Frontend Vercel
+        env('FRONTEND_URL', 'https://coutellerie-frontend.vercel.app'),
     ],
 
     'allowed_origins_patterns' => [
