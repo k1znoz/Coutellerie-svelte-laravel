@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\ContactController;
 Route::get('/health', function () {
     return response()->json([
         'status' => 'OK',
-        'timestamp' => now()->toISOString(),
+        'timestamp' => date('c'),
         'service' => 'Coutellerie Laravel API'
     ]);
 });
