@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 // Route par défaut - Page d'accueil simple
 Route::get('/', function () {
-    return view('welcome');
+    return view('/admin');
 });
 
 // Route API info (accessible via /api-info)

@@ -3,7 +3,7 @@
         'name' => 'coutellerie/monorepo',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'dc0eb0d55df36710edb1c9b9cab83b63f3efb8ff',
+        'reference' => '06dc4c48eb6d41f5b6d005b4afb7a4c61aa7db00',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'coutellerie/monorepo' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'dc0eb0d55df36710edb1c9b9cab83b63f3efb8ff',
+            'reference' => '06dc4c48eb6d41f5b6d005b4afb7a4c61aa7db00',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
