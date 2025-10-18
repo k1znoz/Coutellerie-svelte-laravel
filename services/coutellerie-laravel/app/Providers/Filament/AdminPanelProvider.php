@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Admin\Pages\Auth\Login;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -27,7 +26,6 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path(env('FILAMENT_PATH', 'admin'))
             ->authGuard(env('FILAMENT_AUTH_GUARD', 'web'))
-            ->login(Login::class)
             ->colors([
                 'primary' => Color::Amber,
             ])
