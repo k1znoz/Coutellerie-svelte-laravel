@@ -18,4 +18,5 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         // Enregistrer le fournisseur de panneau d'administration Filament
         \App\Providers\Filament\AdminPanelProvider::class,
-    ]);
+    ])
+    ->create();
