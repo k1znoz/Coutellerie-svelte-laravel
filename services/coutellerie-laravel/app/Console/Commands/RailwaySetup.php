@@ -38,12 +38,27 @@ class RailwaySetup extends Command
         Artisan::call('db:seed', ['--class' => 'AdminUserSeeder']);
         $this->line(Artisan::output());
         
-        // 3. Filament Assets
+        // 3. Livewire Assets (CRITIQUE pour Filament)
+        $this->info('📦 Publishing Livewire assets...');
+        Artisan::call('vendor:publish', ['--tag' => 'livewire:assets', '--force' => true]);
+        $this->line(Artisan::output());
+        
+        // 4. Filament Assets
         $this->info('🎨 Publishing Filament assets...');
+        Artisan::call('vendor:publish', ['--tag' => 'filament-assets', '--force' => true]);
         Artisan::call('filament:assets');
         $this->line(Artisan::output());
         
-        // 4. Storage Link
+        // 5. Filament Optimization
+        $this->info('⚡ Optimizing Filament...');
+        try {
+            Artisan::call('filament:optimize');
+            $this->line(Artisan::output());
+        } catch (\Exception $e) {
+            $this->warn('Filament optimize not available in this version');
+        }
+        
+        // 6. Storage Link
         $this->info('🔗 Creating storage links...');
         try {
             Artisan::call('storage:link');
@@ -52,7 +67,7 @@ class RailwaySetup extends Command
             $this->warn('Storage link already exists or failed');
         }
         
-        // 5. Optimizations
+        // 7. Optimizations
         $this->info('⚡ Optimizing for production...');
         Artisan::call('config:cache');
         Artisan::call('route:cache');

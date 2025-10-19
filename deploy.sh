@@ -124,9 +124,16 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     echo "🎨 Setting up Filament..."
     php artisan filament:install --panels --force --quiet || echo "⚠️ Filament install failed"
     
-    echo "🔧 Publishing and optimizing Filament assets..."
+    echo "� Publishing Livewire assets..."
+    php artisan vendor:publish --tag=livewire:assets --force || echo "⚠️ Livewire assets failed"
+    
+    echo "�🔧 Publishing and optimizing Filament assets..."
     php artisan vendor:publish --tag=filament-assets --force || echo "⚠️ Publishing assets failed"
+    php artisan vendor:publish --tag=filament-config --force || echo "⚠️ Filament config failed"
     php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
+    
+    echo "⚡ Optimizing Filament for production..."
+    php artisan filament:optimize || echo "⚠️ Filament optimize failed"
     
     echo "🔗 Creating storage symlink..."
     php artisan storage:link || echo "⚠️ Storage link failed"
@@ -159,9 +166,21 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     
     if [ -d "public/vendor/filament" ]; then
         echo "Filament assets: ✅"
+        ls -la public/vendor/filament/ | head -3
     else
         echo "Filament assets: ❌"
     fi
+    
+    if [ -d "public/vendor/livewire" ]; then
+        echo "Livewire assets: ✅"
+    else
+        echo "Livewire assets: ❌"
+    fi
+    
+    echo "🔍 Checking critical asset files..."
+    [ -f "public/vendor/filament/filament/filament.js" ] && echo "Filament JS: ✅" || echo "Filament JS: ❌"
+    [ -f "public/vendor/filament/filament/filament.css" ] && echo "Filament CSS: ✅" || echo "Filament CSS: ❌"
+    [ -f "public/vendor/livewire/livewire.js" ] && echo "Livewire JS: ✅" || echo "Livewire JS: ❌"
 else
     echo "❌ Database connection failed, skipping migrations"
 fi
