@@ -36,7 +36,6 @@ Route::get('/debug', function () {
     ]);
 });
 
-// Route de redirection explicite vers login Filament
 Route::get('/login', function () {
-    return redirect('/admin/login');
-});
+    return 'Page de connexion manquante'; // ou ta vue de connexion
+})->name('login');

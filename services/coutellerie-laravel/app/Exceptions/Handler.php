@@ -32,19 +32,11 @@ public function register(): void
 
 protected function unauthenticated($request, AuthenticationException $exception)
 {
-    // Si c'est une requête JSON (API), retourner JSON
-    if ($request->expectsJson()) {
-        return response()->json(['message' => $exception->getMessage()], 401);
-    }
-    
-    // Si c'est une requête sur admin, rediriger vers la page de login admin
-    if ($request->is('admin') || $request->is('admin/*')) {
-        return redirect('/admin');
-    }
-    
-    // Sinon, rediriger vers login général
-    return redirect()->guest(route('login'));
+    return $request->expectsJson()
+        ? response()->json(['message' => $exception->getMessage()], 401)
+        : redirect()->guest(route('filament.admin.auth.login'));
 }
+
 
 
 }
