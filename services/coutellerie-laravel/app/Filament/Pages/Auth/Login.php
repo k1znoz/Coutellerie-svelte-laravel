@@ -2,10 +2,9 @@
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Pages\Auth\Login as BaseLogin;
+use Filament\Pages\Page;
 
-class Login extends BaseLogin
+class Login extends Page
 {
-    // Page de login personnalisée pour le panel admin
-    // Vous pouvez personnaliser ici si nécessaire
+    protected static string $view = 'filament.pages.auth.login';
 }
