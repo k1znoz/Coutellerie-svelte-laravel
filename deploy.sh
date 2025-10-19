@@ -131,6 +131,15 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
     php artisan vendor:publish --tag=filament-config --force || echo "⚠️ Filament config failed"
     
+    echo "🌱 Creating admin user with seeder..."
+    php artisan db:seed --class=AdminUserSeeder --force || echo "⚠️ Admin user seeding failed"
+    
+    echo "🔍 Verifying admin user exists..."
+    php artisan tinker --execute="
+        \$user = \App\Models\User::where('email', 'admin@coutellerie.com')->first();
+        echo \$user ? 'Admin user exists: ' . \$user->email : 'No admin user found';
+    " || echo "User verification failed"
+    
     echo "⚡ Optimizing Filament for production..."
     php artisan filament:optimize || echo "⚠️ Filament optimize failed"
     
@@ -146,6 +155,18 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     
     echo "🔍 Listing available routes..."
     php artisan route:list || echo "⚠️ Route list failed"
+    
+    echo "🔍 Checking Filament auth routes specifically..."
+    php artisan route:list --name=login || echo "No login routes found"
+    
+    echo "🔍 Testing Filament panel registration..."
+    php -r "
+        require_once 'vendor/autoload.php';
+        echo 'Filament Panels: ' . count(\Filament\Facades\Filament::getPanels()) . PHP_EOL;
+        foreach(\Filament\Facades\Filament::getPanels() as \$panel) {
+            echo 'Panel: ' . \$panel->getId() . ' - Path: /' . \$panel->getPath() . PHP_EOL;
+        }
+    " || echo "Panel check failed"
     
     echo "🔍 Checking Filament installation..."
     php -r "
