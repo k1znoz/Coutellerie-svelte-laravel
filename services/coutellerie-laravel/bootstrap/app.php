@@ -16,7 +16,21 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function ($exceptions) {
-        //
+        // Gestion personnalisée de l'authentification pour Filament
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, \Illuminate\Http\Request $request) {
+            // Pour les requêtes API, retourner du JSON
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $e->getMessage()], 401);
+            }
+
+            // Pour les routes Filament admin
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return redirect()->guest('/admin/login');
+            }
+
+            // Pour les autres routes, fallback vers /login
+            return redirect()->guest('/login');
+        });
     })
     ->withProviders([
         // Enregistrer les providers essentiels

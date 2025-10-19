@@ -35,7 +35,7 @@ class RailwaySetup extends Command
         
         // 2. Admin User Seeder
         $this->info('👤 Creating admin user...');
-        Artisan::call('db:seed', ['--class' => 'AdminUserSeeder']);
+        Artisan::call('db:seed', ['--class' => 'AdminUserSeeder', '--force' => true]);
         $this->line(Artisan::output());
         
         // 3. Livewire Assets (CRITIQUE pour Filament)
