@@ -11,7 +11,6 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
-use Filament\Pages\Auth\Login; // ✅ Import du bon Login Filament
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -26,7 +25,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path(env('FILAMENT_PATH', 'admin')) // => /admin
-            ->login(Login::class) // ✅ Utilise la page de connexion Filament
+            ->login() // ✅ RAILWAY FIX: Active les routes de login sans classe spécifique
             ->colors([
                 'primary' => Color::Amber,
             ])
