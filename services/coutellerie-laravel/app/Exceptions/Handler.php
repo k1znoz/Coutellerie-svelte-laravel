@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -32,9 +33,18 @@ public function register(): void
 
 protected function unauthenticated($request, AuthenticationException $exception)
 {
-    return $request->expectsJson()
-        ? response()->json(['message' => $exception->getMessage()], 401)
-        : redirect()->guest(route('filament.admin.auth.login'));
+    // Pour les requêtes API, retourner du JSON
+    if ($request->expectsJson()) {
+        return response()->json(['message' => $exception->getMessage()], 401);
+    }
+
+    // Pour les routes Filament admin
+    if ($request->is('admin') || $request->is('admin/*')) {
+        return redirect()->guest('/admin/login');
+    }
+
+    // Pour les autres routes, fallback vers /login
+    return redirect()->guest('/login');
 }
 
 
