@@ -146,27 +146,45 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     echo "🔗 Creating storage symlink..."
     php artisan storage:link || echo "⚠️ Storage link failed"
     
-    echo "🧹 Clearing all caches..."
+    echo "🧹 RAILWAY FIX - Clearing all caches BEFORE route registration..."
     php artisan view:clear || echo "⚠️ View clear failed"
     php artisan config:clear || echo "⚠️ Config clear failed"
     php artisan route:clear || echo "⚠️ Route clear failed"
     php artisan cache:clear || echo "⚠️ Cache clear failed"
     php artisan optimize:clear || echo "⚠️ Optimize clear failed"
     
+    echo "🔄 RAILWAY FIX - Force reload routes without cache..."
+    # Ne pas mettre en cache les routes pour le moment
+    # php artisan route:cache > /dev/null 2>&1 || echo "⚠️ Route cache failed"
+    
     echo "🔍 Listing available routes..."
     php artisan route:list || echo "⚠️ Route list failed"
     
-    echo "🔍 Checking Filament auth routes specifically..."
-    php artisan route:list --name=login || echo "No login routes found"
+    echo "🔍 DIAGNOSTIC RAILWAY - Checking Filament routes..."
+    php artisan route:list --name=filament || echo "No filament routes found"
     
-    echo "🔍 Testing Filament panel registration..."
-    php -r "
-        require_once 'vendor/autoload.php';
-        echo 'Filament Panels: ' . count(\Filament\Facades\Filament::getPanels()) . PHP_EOL;
-        foreach(\Filament\Facades\Filament::getPanels() as \$panel) {
-            echo 'Panel: ' . \$panel->getId() . ' - Path: /' . \$panel->getPath() . PHP_EOL;
+    echo "🔍 DIAGNOSTIC RAILWAY - Checking all admin routes..."
+    php artisan route:list | grep -i admin || echo "No admin routes found"
+    
+    echo "🔍 DIAGNOSTIC RAILWAY - Testing Filament panel with Laravel context..."
+    php artisan tinker --execute="
+        echo 'Laravel App Status: ' . (app()->bound('app') ? '✅' : '❌') . PHP_EOL;
+        echo 'Filament Service Provider: ' . (app()->bound('filament') ? '✅' : '❌') . PHP_EOL;
+        try {
+            \$panels = \Filament\Facades\Filament::getPanels();
+            echo 'Panels Count: ' . count(\$panels) . PHP_EOL;
+            foreach(\$panels as \$panel) {
+                echo 'Panel ID: ' . \$panel->getId() . PHP_EOL;
+                echo 'Panel Path: /' . \$panel->getPath() . PHP_EOL;
+                echo 'Panel Login: ' . (\$panel->getLogin() ? '✅' : '❌') . PHP_EOL;
+            }
+        } catch (Exception \$e) {
+            echo 'Panel Error: ' . \$e->getMessage() . PHP_EOL;
         }
     " || echo "Panel check failed"
+    
+    echo "🔍 DIAGNOSTIC RAILWAY - Vérifying route registration order..."
+    php artisan route:list --compact | head -10
     
     echo "🔍 Checking Filament installation..."
     php -r "
@@ -209,7 +227,9 @@ fi
 # Cache config
 echo "⚡ Optimizing Laravel for production..."
 php artisan config:cache > /dev/null 2>&1
-php artisan route:cache > /dev/null 2>&1 || echo "⚠️ Route cache failed"
+# RAILWAY FIX: Ne pas cacher les routes pour permettre à Filament de les charger dynamiquement
+# php artisan route:cache > /dev/null 2>&1 || echo "⚠️ Route cache failed"
+echo "📍 RAILWAY: Routes cache DISABLED to allow Filament dynamic loading"
 php artisan view:cache > /dev/null 2>&1 || echo "⚠️ View cache failed"
 
 # Start server
