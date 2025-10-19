@@ -27,6 +27,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path(env('FILAMENT_PATH', 'admin'))
             ->authGuard(env('FILAMENT_AUTH_GUARD', 'web'))
+            ->loginUrl(env('FILAMENT_LOGIN_URL', 'admin/auth/login'))
+            ->login()
             ->colors([
                 'primary' => Color::Amber,
             ])
