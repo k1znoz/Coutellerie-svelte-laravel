@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
+        // Ajouter l'utilisateur admin pour Railway
+        $this->call(AdminUserSeeder::class);
+        
         // Ajouter les couteaux
         $this->call(KnifeSeeder::class);
     }
