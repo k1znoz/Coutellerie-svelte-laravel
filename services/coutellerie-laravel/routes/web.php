@@ -35,7 +35,3 @@ Route::get('/debug', function () {
         'storage_linked' => file_exists(public_path('storage')),
     ]);
 });
-
-Route::get('/login', function () {
-    return 'Page de connexion manquante'; // ou ta vue de connexion
-})->name('login');
