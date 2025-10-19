@@ -43,9 +43,8 @@ class RailwaySetup extends Command
         Artisan::call('vendor:publish', ['--tag' => 'livewire:assets', '--force' => true]);
         $this->line(Artisan::output());
         
-        // 4. Filament Assets
+        // 4. Filament Assets (méthode correcte pour v3)
         $this->info('🎨 Publishing Filament assets...');
-        Artisan::call('vendor:publish', ['--tag' => 'filament-assets', '--force' => true]);
         Artisan::call('filament:assets');
         $this->line(Artisan::output());
         

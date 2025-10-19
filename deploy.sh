@@ -127,10 +127,9 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     echo "� Publishing Livewire assets..."
     php artisan vendor:publish --tag=livewire:assets --force || echo "⚠️ Livewire assets failed"
     
-    echo "�🔧 Publishing and optimizing Filament assets..."
-    php artisan vendor:publish --tag=filament-assets --force || echo "⚠️ Publishing assets failed"
-    php artisan vendor:publish --tag=filament-config --force || echo "⚠️ Filament config failed"
+    echo " Publishing and optimizing Filament assets..."
     php artisan filament:assets --quiet || echo "⚠️ Filament assets failed"
+    php artisan vendor:publish --tag=filament-config --force || echo "⚠️ Filament config failed"
     
     echo "⚡ Optimizing Filament for production..."
     php artisan filament:optimize || echo "⚠️ Filament optimize failed"
@@ -164,9 +163,10 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
         echo "Vite build directory: ❌"
     fi
     
-    if [ -d "public/vendor/filament" ]; then
+    if [ -d "public/css/filament" ] && [ -d "public/js/filament" ]; then
         echo "Filament assets: ✅"
-        ls -la public/vendor/filament/ | head -3
+        ls -la public/css/filament/ | head -3
+        ls -la public/js/filament/ | head -3
     else
         echo "Filament assets: ❌"
     fi
@@ -178,8 +178,8 @@ if php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database: ✅
     fi
     
     echo "🔍 Checking critical asset files..."
-    [ -f "public/vendor/filament/filament/filament.js" ] && echo "Filament JS: ✅" || echo "Filament JS: ❌"
-    [ -f "public/vendor/filament/filament/filament.css" ] && echo "Filament CSS: ✅" || echo "Filament CSS: ❌"
+    [ -f "public/js/filament/filament/app.js" ] && echo "Filament JS: ✅" || echo "Filament JS: ❌"
+    [ -f "public/css/filament/filament/app.css" ] && echo "Filament CSS: ✅" || echo "Filament CSS: ❌"
     [ -f "public/vendor/livewire/livewire.js" ] && echo "Livewire JS: ✅" || echo "Livewire JS: ❌"
 else
     echo "❌ Database connection failed, skipping migrations"
