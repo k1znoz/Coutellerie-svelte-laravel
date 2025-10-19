@@ -11,7 +11,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
-use App\Filament\Pages\Auth\Login;
+use Filament\Pages\Auth\Login; // ✅ Import du bon Login Filament
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -25,9 +25,8 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->id('admin')
-            ->path(env('FILAMENT_PATH', 'admin'))
-            ->authGuard(env('FILAMENT_AUTH_GUARD', 'web'))
-            ->login()
+            ->path(env('FILAMENT_PATH', 'admin')) // => /admin
+            ->login(Login::class) // ✅ Utilise la page de connexion Filament
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -36,7 +35,7 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
@@ -54,7 +53,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-        ;
+            ]);
     }
 }
