@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages\Auth;
+namespace Filament\Pages\Auth;
 
 use Filament\Pages\Page;
 
