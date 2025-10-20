@@ -1,17 +1,22 @@
 #!/bin/bash
 
-# Script de démarrage pour Railway/Railpack
-echo "🚀 Démarrage Laravel pour production..."
+# Script de démarrage pour Railway
+echo "🚀 Démarrage Laravel..."
 
-# Exécuter les migrations
+# Générer la clé si nécessaire
+if [ -z "$APP_KEY" ]; then
+    php artisan key:generate --force
+fi
+
+# Migrations et optimisations
 php artisan migrate --force
+php artisan storage:link --force 2>/dev/null || true
 
-# Créer le lien de stockage
-php artisan storage:link
+# Assets Filament
+php artisan filament:assets
 
-# Optimiser pour la production
+# Cache optimizations
 php artisan config:cache
 php artisan route:cache
-php artisan view:cache
 
-echo "✅ Application prête pour production !"
+echo "✅ Application prête !"

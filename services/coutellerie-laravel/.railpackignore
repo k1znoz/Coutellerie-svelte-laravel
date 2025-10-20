@@ -39,3 +39,7 @@ bootstrap/cache/*
 *.temp
 .DS_Store
 Thumbs.db
+
+# IMPORTANT: Garder les assets Filament compilés
+!public/css/filament/
+!public/js/filament/
