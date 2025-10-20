@@ -1,8 +1,9 @@
 [build]
 builder = "RAILPACK"
+buildCommand = "composer update --lock --no-scripts --no-interaction"
 
-[environments.production.variables.build]
-NODE_VERSION = "20"
+[build.variables]
+RAILPACK_PHP_EXTENSIONS = "gd,imagick,intl,zip"
 
 [deploy]
 startCommand = "./start.sh"

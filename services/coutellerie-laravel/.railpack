@@ -1,0 +1,2 @@
+# Configuration Railpack
+extensions = ["gd", "imagick", "intl", "zip", "pdo_mysql", "opcache"]
