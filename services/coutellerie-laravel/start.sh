@@ -3,6 +3,12 @@
 # Script de démarrage pour Railway
 echo "🚀 Démarrage Laravel..."
 
+# Installation des dépendances si nécessaire
+if [ ! -d "vendor" ]; then
+    echo "📦 Installation des dépendances Composer..."
+    composer install --optimize-autoloader --no-dev --ignore-platform-reqs
+fi
+
 # Générer la clé si nécessaire
 if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
