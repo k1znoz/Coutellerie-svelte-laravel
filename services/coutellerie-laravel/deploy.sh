@@ -16,6 +16,13 @@ if [ -z "$APP_KEY" ]; then
     exit 1
 fi
 
+# Installation des dépendances Composer avec extensions
+echo "📦 Installation des dépendances Composer..."
+if ! composer install --optimize-autoloader --no-dev --no-scripts --no-interaction; then
+    echo "⚠️  Installation avec --ignore-platform-reqs (extensions en cours d'activation)"
+    composer install --optimize-autoloader --no-dev --no-scripts --no-interaction --ignore-platform-reqs
+fi
+
 # Vérification de la base de données
 echo "🗃️ Configuration de la base de données..."
 if [ -z "$DATABASE_URL" ] && [ -z "$DB_HOST" ]; then
