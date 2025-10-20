@@ -1,2 +1,7 @@
 # Configuration Railpack
-extensions = ["gd", "imagick", "intl", "zip", "pdo_mysql", "opcache"]
+[php]
+extensions = ["gd", "imagick", "intl", "zip", "pdo_mysql", "opcache", "mbstring", "xml", "curl", "bcmath"]
+version = "8.3"
+
+[build]
+composer_install_args = "--optimize-autoloader --no-dev --ignore-platform-reqs"

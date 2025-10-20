@@ -1,6 +1,6 @@
 [build]
 builder = "RAILPACK"
-buildCommand = "composer update --lock --no-scripts --no-interaction"
+buildCommand = "composer install --optimize-autoloader --no-dev --ignore-platform-reqs"
 
 [build.variables]
 RAILPACK_PHP_EXTENSIONS = "gd,imagick,intl,zip"
