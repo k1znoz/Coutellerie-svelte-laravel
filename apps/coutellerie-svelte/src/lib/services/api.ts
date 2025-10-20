@@ -39,7 +39,8 @@ export type ContactMessage = {
 };
 
 // URL de base de l'API
-export const API_BASE_URL = 'https://coutellerie-production.up.railway.app/api/';
+// Configuration de l'API - utilise l'URL Railway existante
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://coutellerie-production.up.railway.app/api/';
 
 // Types pour les options et réponses API
 interface ApiOptions {
@@ -89,31 +90,37 @@ function getAuthHeaders(): HeadersInit {
  * @returns Liste des couteaux
  */
 export async function getAllKnives(options: ApiOptions = {}): Promise<Knife[]> {
-	const headers = options.headers || {
-		'Content-Type': 'application/json'
-	};
-
-	const response = await fetch(`${API_BASE_URL}knives`, {
-		method: 'GET',
-		headers
-	});
-
-	if (!response.ok) {
-		throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
-	}
-
-	const responseText = await response.text();
-
 	try {
+		const headers = options.headers || {
+			'Content-Type': 'application/json'
+		};
+
+		const response = await fetch(`${API_BASE_URL}knives`, {
+			method: 'GET',
+			headers
+		});
+
+		if (!response.ok) {
+			throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+		}
+
+		const responseText = await response.text();
+
+		if (!responseText) {
+			return [];
+		}
+
 		const result = JSON.parse(responseText) as ApiResponse;
 
 		if (result && typeof result === 'object' && Array.isArray(result.data)) {
-			return result.data as Knife[];
+			return (result.data as Knife[]).filter(knife => knife.id !== undefined);
 		} else {
-			throw new Error('Format de données inattendu');
+			console.warn('Format de données inattendu:', result);
+			return [];
 		}
-	} catch {
-		throw new Error(`Erreur de parsing JSON: ${responseText.substring(0, 100)}...`);
+	} catch (error) {
+		console.error('Erreur getAllKnives:', error);
+		return [];
 	}
 }
 

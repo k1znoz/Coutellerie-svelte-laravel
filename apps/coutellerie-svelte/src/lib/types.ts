@@ -83,13 +83,13 @@ export interface ContactFormStatus {
 }
 
 export interface GalleryItem {
-	id: string | number;
-	name: string;           // Changé de "title" vers "name" pour correspondre à Knife
+	id: number;
+	name: string;
 	category: string;
-	material?: string;
-	images?: string[];
+	material: string;
+	images: string[];
 	primaryImage?: string; // Pour l'affichage dans la grille
-	type?: string;
-	length?: string;
-	price?: number;
+	type: string;
+	length: string;
+	price: number;
 }

@@ -59,9 +59,11 @@
 			dataToFilter = dataToFilter.filter((knife) => knife.material === material);
 		}
 
-		return dataToFilter.map((knife) => ({
-			id: knife.id,
-			name: knife.name,           // Changé de title vers name
+	return dataToFilter
+		.filter(knife => knife.id !== undefined)
+		.map((knife) => ({
+			id: knife.id!,
+			name: knife.name,
 			category: knife.category,
 			material: knife.material,
 			images: knife.images || [],
