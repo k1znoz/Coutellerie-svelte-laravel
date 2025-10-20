@@ -43,3 +43,9 @@ Thumbs.db
 # IMPORTANT: Garder les assets Filament compilés
 !public/css/filament/
 !public/js/filament/
+
+# Assets sources - pas besoin sur Railway si assets déjà compilés
+package.json
+package-lock.json
+vite.config.js
+tailwind.config.js
