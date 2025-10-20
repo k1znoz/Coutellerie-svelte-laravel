@@ -53,24 +53,26 @@ export interface Value {
 	icon: string;
 }
 
-// Interface pour les objets knife (couteaux)
+// Interface pour les objets knife (couteaux) - aligné avec l'API Laravel
 export interface Knife {
-	id: number;
-	title: string;
+	id?: number;
+	name: string;           // Changé de "title" vers "name" pour correspondre à la DB
 	category: string;
-	images: string[];
 	description: string;
-	type?: string;
-	length?: string;
-	material?: string;
-	price?: number;
+	images: string[];       // Tableau d'URLs d'images
+	type: string;           // Obligatoire selon la migration
+	length: string;         // Obligatoire selon la migration
+	material: string;       // Obligatoire selon la migration
+	price: number;          // Obligatoire selon la migration (decimal)
+	created_at?: string;
+	updated_at?: string;
 }
 
-// Interfaces pour les composants Contact
+// Interfaces pour les composants Contact - aligné avec l'API Laravel
 export interface ContactFormData {
-	name: string;
+	name: string;           // Obligatoire selon la migration
 	email: string;
-	subject: string;
+	subject?: string;       // Optionnel selon la migration
 	message: string;
 }
 
@@ -82,9 +84,12 @@ export interface ContactFormStatus {
 
 export interface GalleryItem {
 	id: string | number;
-	title: string;
+	name: string;           // Changé de "title" vers "name" pour correspondre à Knife
 	category: string;
 	material?: string;
 	images?: string[];
 	primaryImage?: string; // Pour l'affichage dans la grille
+	type?: string;
+	length?: string;
+	price?: number;
 }

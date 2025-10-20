@@ -1,14 +1,8 @@
 <script lang="ts">
-	interface LightboxItem {
-		id: string | number;
-		title: string;
-		category: string;
-		images: string[];
-		description: string;
-	}
+	import type { Knife } from '$lib/types';
 
 	export let isOpen = false;
-	export let item: LightboxItem | null = null;
+	export let item: Knife | null = null;
 	export let onClose: () => void = () => {};
 
 	let currentImageIndex = 0;
@@ -110,7 +104,7 @@
 			on:click|stopPropagation={() => {}}
 		>
 			<div class="image-container">
-				<img src={item.images[currentImageIndex]} alt={item.title} />
+				<img src={item.images[currentImageIndex]} alt={item.name} />
 
 				<!-- Bouton plein écran -->
 				<button
@@ -149,7 +143,7 @@
 								on:click|stopPropagation={() => selectImage(index)}
 								aria-label="Voir l'image {index + 1}"
 							>
-								<img src={image} alt="{item.title} - Image {index + 1}" loading="lazy" />
+								<img src={image} alt="{item.name} - Image {index + 1}" loading="lazy" />
 							</button>
 						{/each}
 					</div>
@@ -157,7 +151,7 @@
 			</div>
 
 			<div class="lightbox-info">
-				<h3 id="lightbox-title">{item.title}</h3>
+				<h3 id="lightbox-title">{item.name}</h3>
 				<p class="category">{item.category}</p>
 				<p>{item.description}</p>
 				{#if item.images.length > 1}

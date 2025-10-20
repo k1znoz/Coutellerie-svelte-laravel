@@ -1,12 +1,5 @@
 <script lang="ts">
-	// Définir un type pour les items de la galerie
-	interface GalleryItem {
-		id: string | number;
-		title: string;
-		category: string;
-		images?: string[];
-		primaryImage?: string;
-	}
+	import type { GalleryItem } from '$lib/types';
 
 	// Fonction pour obtenir la première image disponible
 	function getPrimaryImage(item: GalleryItem): string {
@@ -33,10 +26,10 @@
 			on:keydown={(e) => e.key === 'Enter' && selectItem(item)}
 			role="button"
 			tabindex="0"
-			aria-label="Voir le détail de {item.title}"
+			aria-label="Voir le détail de {item.name}"
 		>
 			<div class="gallery-image">
-				<img src={getPrimaryImage(item)} alt={item.title} loading="lazy" />
+				<img src={getPrimaryImage(item)} alt={item.name} loading="lazy" />
 				{#if item.images && item.images.length > 1}
 					<div class="image-count">
 						<span>+{item.images.length - 1}</span>
@@ -44,7 +37,7 @@
 				{/if}
 			</div>
 			<div class="gallery-info">
-				<h3>{item.title}</h3>
+				<h3>{item.name}</h3>
 				<p class="category">{item.category}</p>
 			</div>
 		</div>

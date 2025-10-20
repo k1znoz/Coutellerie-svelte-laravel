@@ -3,6 +3,7 @@
 
 // Types
 export * from './types';
+export type { Knife, ContactFormData, ContactMessage } from './services/api';
 
 // Composants
 export { default as HeroSection } from './components/HeroSection.svelte';

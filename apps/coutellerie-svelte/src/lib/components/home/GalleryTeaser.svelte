@@ -23,7 +23,7 @@
 			// Mapper vers le format attendu
 			featuredImages = selectedKnives.map((knife) => ({
 				src: knife.images && knife.images.length > 0 ? knife.images[0] : '/images/placeholder.webp',
-				alt: `Création artisanale - ${knife.title}`,
+				alt: `Création artisanale - ${knife.name}`,
 				id: knife.id
 			}));
 		} catch (error) {

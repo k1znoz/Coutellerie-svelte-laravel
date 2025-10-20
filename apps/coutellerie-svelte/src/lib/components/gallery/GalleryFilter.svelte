@@ -61,11 +61,14 @@
 
 		return dataToFilter.map((knife) => ({
 			id: knife.id,
-			title: knife.title,
+			name: knife.name,           // Changé de title vers name
 			category: knife.category,
 			material: knife.material,
 			images: knife.images || [],
-			primaryImage: knife.images && knife.images.length > 0 ? knife.images[0] : undefined
+			primaryImage: knife.images && knife.images.length > 0 ? knife.images[0] : undefined,
+			type: knife.type,
+			length: knife.length,
+			price: knife.price
 		}));
 	}
 

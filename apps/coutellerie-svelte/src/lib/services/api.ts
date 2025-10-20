@@ -1,9 +1,45 @@
 // Service API pour interagir avec le backend
 
-import type { Knife, ContactFormData } from '$lib/types.ts';
+export type Knife = {
+	id?: number;
+	name: string;
+	category: string;
+	description: string;
+	images: string[]; // Tableau d'URLs d'images
+	type: string;
+	length: string;
+	material: string;
+	price: number; // Prix décimal
+	created_at?: string;
+	updated_at?: string;
+	// champs additionnels possibles renvoyés par l'API
+	[key: string]: any;
+};
+
+export type ContactFormData = {
+	name: string;
+	email: string;
+	subject?: string;
+	message: string;
+	// champs additionnels possibles
+	[key: string]: any;
+};
+
+// Type pour les messages de contact (réponse de l'API)
+export type ContactMessage = {
+	id?: number;
+	name: string;
+	email: string;
+	subject?: string;
+	message: string;
+	status: 'new' | 'read' | 'replied';
+	ip_address?: string;
+	created_at?: string;
+	updated_at?: string;
+};
 
 // URL de base de l'API
-export const API_BASE_URL = 'http://localhost:8000/api/';
+export const API_BASE_URL = 'https://coutellerie-production.up.railway.app/api/';
 
 // Types pour les options et réponses API
 interface ApiOptions {
@@ -93,11 +129,11 @@ export async function createKnife(
 ): Promise<ApiResponse> {
 	const headers = options.headers || getAuthHeaders();
 
-	if (!knife.title || !knife.category || !knife.description) {
-		throw new Error('Champs requis manquants: titre, catégorie et description sont obligatoires');
+	if (!knife.name || !knife.category || !knife.description) {
+		throw new Error('Champs requis manquants: nom, catégorie et description sont obligatoires');
 	}
 
-	const response = await fetch(`${API_BASE_URL}api/knives.php`, {
+	const response = await fetch(`${API_BASE_URL}knives`, {
 		method: 'POST',
 		headers,
 		body: JSON.stringify(knife)
@@ -146,7 +182,7 @@ export async function createKnife(
 export async function updateKnife(knife: Knife, options: ApiOptions = {}): Promise<ApiResponse> {
 	const headers = options.headers || getAuthHeaders();
 
-	const response = await fetch(`${API_BASE_URL}api/knives.php`, {
+	const response = await fetch(`${API_BASE_URL}knives/${knife.id}`, {
 		method: 'PUT',
 		headers,
 		body: JSON.stringify(knife)
@@ -187,7 +223,7 @@ export async function updateKnife(knife: Knife, options: ApiOptions = {}): Promi
 export async function deleteKnife(id: number, options: ApiOptions = {}): Promise<ApiResponse> {
 	const headers = options.headers || getAuthHeaders();
 
-	const response = await fetch(`${API_BASE_URL}api/knives.php?id=${id}`, {
+	const response = await fetch(`${API_BASE_URL}knives/${id}`, {
 		method: 'DELETE',
 		headers
 	});
@@ -225,13 +261,12 @@ export async function deleteKnife(id: number, options: ApiOptions = {}): Promise
  * @returns Résultat de l'authentification
  */
 export async function login(username: string, password: string): Promise<AuthResponse> {
-	const response = await fetch(`${API_BASE_URL}auth.php`, {
+	const response = await fetch(`${API_BASE_URL}auth/login`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
-			action: 'login',
 			username,
 			password
 		})
@@ -266,13 +301,12 @@ export async function refreshAccessToken(): Promise<AuthResponse> {
 		throw new Error('No refresh token available');
 	}
 
-	const response = await fetch(`${API_BASE_URL}auth.php`, {
+	const response = await fetch(`${API_BASE_URL}auth/refresh`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
-			action: 'refresh',
 			refreshToken
 		})
 	});
@@ -298,13 +332,12 @@ export async function refreshAccessToken(): Promise<AuthResponse> {
  * @returns Résultat de la vérification
  */
 export async function verifyToken(token: string): Promise<AuthResponse> {
-	const response = await fetch(`${API_BASE_URL}auth.php`, {
+	const response = await fetch(`${API_BASE_URL}auth/verify`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
-			action: 'verify',
 			token
 		})
 	});

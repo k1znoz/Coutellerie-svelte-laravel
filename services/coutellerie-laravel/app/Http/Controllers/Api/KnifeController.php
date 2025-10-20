@@ -30,7 +30,7 @@ class KnifeController extends Controller
 
             return [
                 'id' => $knife->id,
-                'title' => $knife->name,
+                'name' => $knife->name,           // Corrigé: 'name' au lieu de 'title'
                 'category' => $knife->category,
                 'images' => $fullPathImages,
                 'description' => $knife->description,
@@ -38,6 +38,8 @@ class KnifeController extends Controller
                 'length' => $knife->length,
                 'material' => $knife->material,
                 'price' => $knife->price,
+                'created_at' => $knife->created_at,
+                'updated_at' => $knife->updated_at,
             ];
         });
 
@@ -88,7 +90,7 @@ class KnifeController extends Controller
 
         $mappedKnife = [
             'id' => $knife->id,
-            'title' => $knife->name,
+            'name' => $knife->name,           // Corrigé: 'name' au lieu de 'title'
             'category' => $knife->category,
             'images' => $fullPathImages,
             'description' => $knife->description,
@@ -96,6 +98,8 @@ class KnifeController extends Controller
             'length' => $knife->length,
             'material' => $knife->material,
             'price' => $knife->price,
+            'created_at' => $knife->created_at,
+            'updated_at' => $knife->updated_at,
         ];
 
         return response()->json(['data' => $mappedKnife]);
