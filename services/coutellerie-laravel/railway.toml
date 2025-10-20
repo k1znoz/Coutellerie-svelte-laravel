@@ -2,6 +2,7 @@
 builder = "RAILPACK"
 
 [deploy]
+startCommand = "./deploy.sh"
 healthcheckPath = "/"
 
 [environments.production.variables]
