@@ -1,0 +1,24 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "dockerfile"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[environments.production.variables]
+APP_ENV = "production"
+APP_DEBUG = "false"
+LOG_CHANNEL = "stderr"
+LOG_LEVEL = "info"
+SESSION_DRIVER = "database"
+CACHE_DRIVER = "database"
+QUEUE_CONNECTION = "database"
+BROADCAST_DRIVER = "log"
+MAIL_MAILER = "log"
+
+[environments.production.volumes]
+# Volume pour le stockage des fichiers uploadés
+"/app/storage" = { size = "1GB", mount = "/app/storage" }
