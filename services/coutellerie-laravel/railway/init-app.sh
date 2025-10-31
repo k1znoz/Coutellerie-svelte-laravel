@@ -1,32 +1,17 @@
 #!/bin/bash
-# Script d'initialisation pour le déploiement Railway - Service Principal
-# RAILPACK gère déjà composer install + extensions PHP
+# Script d'initialisation Laravel pour NIXPACKS sur Railway
 
-# Exit the script if any command fails
 set -e
 
-echo "🚀 Initialisation du service principal Laravel sur Railway..."
+echo "🚀 Initialisation Laravel avec NIXPACKS..."
 
-# Vérification que nous sommes bien sur Railway
-echo "🔧 Environnement Railway détecté : $RAILWAY_ENVIRONMENT_NAME"
-
-# Installation des dépendances en ignorant les extensions manquantes temporairement
-echo "📦 Installation des dépendances PHP (ignore platform requirements)..."
-composer install --optimize-autoloader --no-dev --no-interaction --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip
-
-# Vérification des variables d'environnement critiques
+# Vérification APP_KEY
 if [ -z "$APP_KEY" ]; then
-    echo "❌ APP_KEY manquante - génération automatique..."
+    echo "❌ APP_KEY manquante - génération..."
     php artisan key:generate --force --show
 fi
 
-# Vérification de la base de données  
-if [ -z "$DATABASE_URL" ] && [ -z "$DB_URL" ]; then
-    echo "❌ Configuration base de données manquante (DATABASE_URL ou DB_URL)"
-    exit 1
-fi
-
-echo "✅ Variables d'environnement validées"
+echo "✅ Configuration validée"
 
 # Run migrations
 echo "🔄 Exécution des migrations..."

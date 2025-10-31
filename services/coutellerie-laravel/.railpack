@@ -1,5 +1,0 @@
-[php]
-extensions = ["intl", "zip", "gd", "bcmath", "mbstring", "xml", "curl", "pdo_mysql"]
-
-[build]
-composer = false
