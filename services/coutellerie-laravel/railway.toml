@@ -2,35 +2,18 @@
 builder = "RAILPACK"
 
 [build.variables]
-# Extensions PHP critiques pour Laravel + Filament
+# Extensions PHP essentielles pour Laravel + Filament
 RAILPACK_PHP_EXTENSIONS = "intl,zip,gd,bcmath,mbstring,xml,curl,pdo_mysql"
-# Assurer que composer install utilise les bonnes extensions
-RAILPACK_COMPOSER_INSTALL_ARGS = "--optimize-autoloader --no-dev"
 
 [deploy]
-# Script d'initialisation simple - tout en un
+# Script d'initialisation après que RAILPACK ait tout installé
 preDeployCommand = "chmod +x ./railway/init-app.sh && sh ./railway/init-app.sh"
 healthcheckPath = "/"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 
-[environments.production.variables]
-APP_ENV = "production"
-APP_DEBUG = "false"
-APP_URL = "${{ RAILWAY_PUBLIC_DOMAIN }}"
-# Configuration des logs selon Railway
-LOG_CHANNEL = "stderr" 
-LOG_STDERR_FORMATTER = "Monolog\\Formatter\\JsonFormatter"
-# Configuration de la base de données
-DB_CONNECTION = "mysql"
-DB_URL = "${{ DATABASE_URL }}"
-# Configuration simple - pas besoin de queues complexes pour ce projet
-SESSION_DRIVER = "database"
-CACHE_DRIVER = "database" 
-QUEUE_CONNECTION = "sync"
-# Configuration Filesystem
-FILESYSTEM_DISK = "local"
+# Variables gérées directement dans Railway Dashboard
+# Utilise les variables partagées et références MySQL configurées
 
 [environments.production.volumes]
-# Volume pour le stockage des fichiers uploadés
 "/app/storage" = { size = "1GB", mount = "/app/storage" }
