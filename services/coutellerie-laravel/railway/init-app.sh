@@ -10,9 +10,9 @@ echo "🚀 Initialisation du service principal Laravel sur Railway..."
 # Vérification que nous sommes bien sur Railway
 echo "🔧 Environnement Railway détecté : $RAILWAY_ENVIRONMENT_NAME"
 
-# Vérification et installation des dépendances Composer avec les extensions
-echo "📦 Installation des dépendances PHP avec extensions..."
-composer install --optimize-autoloader --no-dev --no-interaction
+# Installation des dépendances en ignorant les extensions manquantes temporairement
+echo "📦 Installation des dépendances PHP (ignore platform requirements)..."
+composer install --optimize-autoloader --no-dev --no-interaction --ignore-platform-req=ext-intl --ignore-platform-req=ext-zip
 
 # Vérification des variables d'environnement critiques
 if [ -z "$APP_KEY" ]; then
