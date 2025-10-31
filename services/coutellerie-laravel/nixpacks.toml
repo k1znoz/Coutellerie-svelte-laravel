@@ -1,18 +1,3 @@
+# Configuration NIXPACKS pour Laravel
 [variables]
-# Variables d'environnement pour NIXPACKS
 NIXPACKS_PHP_ROOT_DIR = "/app/public"
-NIXPACKS_PHP_FALLBACK_PATH = "/index.php"
-
-[phases.setup]
-# Installation des extensions PHP via composer.json (automatique)
-
-[phases.build]
-# Build personnalisé pour Laravel
-cmds = [
-    "php artisan config:cache",
-    "php artisan route:cache", 
-    "php artisan view:cache"
-]
-
-[phases.start]
-# Démarrage avec nginx (automatique)
