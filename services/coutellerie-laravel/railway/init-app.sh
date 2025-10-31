@@ -1,21 +1,24 @@
 #!/bin/bash
 # Script d'initialisation pour le déploiement Railway - Service Principal
-# Make sure this file has executable permissions, run `chmod +x railway/init-app.sh`
+# RAILPACK gère déjà composer install + extensions PHP
 
 # Exit the script if any command fails
 set -e
 
 echo "🚀 Initialisation du service principal Laravel sur Railway..."
 
+# Vérification que nous sommes bien sur Railway
+echo "🔧 Environnement Railway détecté : $RAILWAY_ENVIRONMENT_NAME"
+
 # Vérification des variables d'environnement critiques
 if [ -z "$APP_KEY" ]; then
     echo "❌ APP_KEY manquante - génération automatique..."
-    php artisan key:generate --force
+    php artisan key:generate --force --show
 fi
 
-# Vérification de la base de données
-if [ -z "$DATABASE_URL" ] && [ -z "$DB_HOST" ]; then
-    echo "❌ Configuration base de données manquante"
+# Vérification de la base de données  
+if [ -z "$DATABASE_URL" ] && [ -z "$DB_URL" ]; then
+    echo "❌ Configuration base de données manquante (DATABASE_URL ou DB_URL)"
     exit 1
 fi
 
