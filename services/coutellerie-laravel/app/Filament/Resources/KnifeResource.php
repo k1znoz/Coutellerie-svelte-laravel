@@ -7,6 +7,7 @@ use App\Filament\Resources\KnifeResource\RelationManagers;
 use App\Models\Knife;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -19,7 +20,7 @@ class KnifeResource extends Resource
 {
     protected static ?string $model = Knife::class;
 
-    // protected static ?string $navigationIcon = 'heroicon-o-knife';
+    protected static ?string $navigationIcon = 'heroicon-o-scissors';
 
     protected static ?string $navigationLabel = 'Couteaux';
 
@@ -36,60 +37,78 @@ class KnifeResource extends Resource
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\Select::make('category')
+                // --- DEBUT DES MODIFICATIONS ---
+                Select::make('category_id')
                     ->label('Catégorie')
-                    ->options(fn () => Knife::getCategoriesForSelect())
+                    ->relationship('category', 'name')
                     ->searchable()
+                    ->preload()
                     ->createOptionForm([
-                        Forms\Components\TextInput::make('category')
-                            ->label('Nouvelle catégorie')
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nom de la catégorie')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->unique('categories', 'name'),
                     ])
-                    ->createOptionUsing(function (array $data) {
-                        return $data['category'];
-                    })
-                    ->required()
-                    ->helperText('Sélectionnez une catégorie existante ou créez-en une nouvelle'),
+                    ->required(),
 
-                Forms\Components\TextInput::make('type')
+                Select::make('type_id')
                     ->label('Type')
-                    ->required()
-                    ->maxLength(255),
-
-                Forms\Components\Textarea::make('description')
-                    ->label('Description')
-                    ->required()
-                    ->rows(3),
-
-                Forms\Components\FileUpload::make('images')
-                    ->label('Images')
-                    ->multiple()
-                    ->image()
-                    ->disk('public')
-                    ->directory('knives')
-                    ->maxFiles(5)
-                    ->reorderable()
-                    ->downloadable()
-                    ->previewable()
-                    ->columnSpanFull(),
+                    ->relationship('type', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nom du type')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique('types', 'name'),
+                    ])
+                    ->required(),
+                
+                Select::make('material_id')
+                    ->label('Matériau')
+                    ->relationship('material', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nom du matériau')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique('materials', 'name'),
+                    ])
+                    ->required(),
+                // --- FIN DES MODIFICATIONS ---
 
                 Forms\Components\TextInput::make('length')
                     ->label('Longueur')
                     ->required()
-                    ->maxLength(255),
+                    ->numeric(),
 
-                Forms\Components\TextInput::make('material')
-                    ->label('Matériau')
+                Forms\Components\Textarea::make('description')
+                    ->label('Description')
                     ->required()
-                    ->maxLength(255),
+                    ->columnSpanFull(),
 
                 Forms\Components\TextInput::make('price')
-                    ->label('Prix (€)')
+                    ->label('Prix')
                     ->required()
                     ->numeric()
-                    ->step(0.01)
-                    ->minValue(0),
+                    ->prefix('€'),
+
+                Forms\Components\FileUpload::make('images')
+                    ->label('Images')
+                    ->multiple()
+                    ->directory('knives')
+                    ->image()
+                    ->reorderable()
+                    ->appendFiles()
+                    ->panelLayout('grid'),
+
+                Forms\Components\Toggle::make('available')
+                    ->label('Disponible')
+                    ->required(),
             ]);
     }
 
@@ -99,7 +118,7 @@ class KnifeResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('images')
                     ->label('Images')
-                    ->disk('public') // Ajout de cette ligne
+                    ->disk('public')
                     ->circular()
                     ->stacked()
                     ->limit(3)
@@ -107,41 +126,51 @@ class KnifeResource extends Resource
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nom')
-                    ->searchable()
-                    ->sortable(),
+                    ->searchable(),
 
-                Tables\Columns\TextColumn::make('category')
+                // --- MODIFICATION : Afficher le nom de la relation plutôt que l'ID ---
+                Tables\Columns\TextColumn::make('category.name')
                     ->label('Catégorie')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('type')
+                Tables\Columns\TextColumn::make('type.name')
                     ->label('Type')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('material.name')
+                    ->label('Matériau')
+                    ->searchable()
+                    ->sortable(),
+                // --- FIN DE LA MODIFICATION ---
 
                 Tables\Columns\TextColumn::make('length')
-                    ->label('Longueur'),
-
-                Tables\Columns\TextColumn::make('material')
-                    ->label('Matériau'),
+                    ->label('Longueur')
+                    ->numeric()
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('price')
                     ->label('Prix')
                     ->money('EUR')
                     ->sortable(),
 
+                Tables\Columns\IconColumn::make('available')
+                    ->label('Disponible')
+                    ->boolean(),
+
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Créé le')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('category')
-                    ->label('Catégorie')
-                    ->options(function () {
-                        return Knife::getCategoriesForSelect();
-                    }),
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
