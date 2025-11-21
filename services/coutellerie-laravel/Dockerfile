@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql zip exif pcntl bcmath# Installer Composer (gestionnaire de dépendances PHP)
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql zip exif pcntl bcmath
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Définir le répertoire de travail
