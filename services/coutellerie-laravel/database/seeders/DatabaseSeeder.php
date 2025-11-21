@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,17 +12,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            AdminUserSeeder::class,
+            // Décommentez les lignes suivantes si vous voulez aussi lancer ces seeders en production
+            // KnifeSeeder::class,
+            // ContactMessageSeeder::class,
         ]);
-
-        // Ajouter l'utilisateur admin pour Railway
-        $this->call(AdminUserSeeder::class);
-        
-        // Ajouter les couteaux
-        $this->call(KnifeSeeder::class);
     }
 }
