@@ -35,9 +35,10 @@ RUN composer install --no-dev --no-interaction
 # On copie d'abord .env.example pour que la commande artisan ne échoue pas.
 RUN cp .env.example .env
 RUN php artisan key:generate
-RUN php artisan config:cache
-RUN php artisan route:cache
-RUN php artisan view:cache
+# La mise en cache de la configuration est désactivée pour permettre aux variables d'environnement de Render d'être prises en compte au runtime.
+# RUN php artisan config:cache
+# RUN php artisan route:cache
+# RUN php artisan view:cache
 
 # Définir les permissions pour Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
