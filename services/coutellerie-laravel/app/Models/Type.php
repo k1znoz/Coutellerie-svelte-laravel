@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Type extends Model
 {
     protected $fillable = ['name'];
 
-    public function knives(): HasMany
+    public function knives(): BelongsToMany
     {
-        return $this->hasMany(Knife::class);
+        return $this->belongsToMany(Knife::class);
     }
 }

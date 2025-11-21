@@ -12,15 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('knives', function (Blueprint $table) {
-            // Supprimer les anciennes colonnes de texte
+            // Supprimer les anciennes colonnes
             $table->dropColumn(['category', 'type', 'material']);
 
-            // Ajouter les nouvelles colonnes de clé étrangère
-            // onDelete('set null') signifie que si une catégorie est supprimée,
-            // le couteau ne sera pas supprimé, mais son champ category_id deviendra null.
+            // Ajouter SEULEMENT la clé étrangère pour category (one-to-many)
+            // Les types et matériaux seront gérés par les tables pivots
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('type_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('material_id')->nullable()->constrained()->onDelete('set null');
         });
     }
 
@@ -30,13 +27,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('knives', function (Blueprint $table) {
-            // Supprimer les nouvelles colonnes de clé étrangère
             $table->dropForeign(['category_id']);
-            $table->dropForeign(['type_id']);
-            $table->dropForeign(['material_id']);
-            $table->dropColumn(['category_id', 'type_id', 'material_id']);
+            $table->dropColumn('category_id');
 
-            // Recréer les anciennes colonnes de texte
+            // Recréer les anciennes colonnes
             $table->string('category');
             $table->string('type');
             $table->string('material');

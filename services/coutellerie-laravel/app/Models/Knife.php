@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Knife extends Model
 {
@@ -12,9 +13,7 @@ class Knife extends Model
 
     protected $fillable = [
         'name',
-        'category_id',  // Changé de 'category' vers 'category_id'
-        'type_id',      // Changé de 'type' vers 'type_id'
-        'material_id',  // Changé de 'material' vers 'material_id'
+        'category_id',  // One-to-many
         'length',
         'description',
         'price',
@@ -27,19 +26,21 @@ class Knife extends Model
         'available' => 'boolean',
     ];
 
-    // Relations avec les nouvelles tables
+    // Relation one-to-many avec Category
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function type(): BelongsTo
+    // Relation many-to-many avec Type
+    public function types(): BelongsToMany
     {
-        return $this->belongsTo(Type::class);
+        return $this->belongsToMany(Type::class);
     }
 
-    public function material(): BelongsTo
+    // Relation many-to-many avec Material
+    public function materials(): BelongsToMany
     {
-        return $this->belongsTo(Material::class);
+        return $this->belongsToMany(Material::class);
     }
 }

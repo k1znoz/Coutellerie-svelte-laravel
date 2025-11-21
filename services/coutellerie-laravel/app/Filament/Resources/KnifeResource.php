@@ -37,7 +37,7 @@ class KnifeResource extends Resource
                     ->required()
                     ->maxLength(255),
 
-                // --- DEBUT DES MODIFICATIONS ---
+                // Catégorie : Select simple (one-to-many)
                 Select::make('category_id')
                     ->label('Catégorie')
                     ->relationship('category', 'name')
@@ -52,9 +52,11 @@ class KnifeResource extends Resource
                     ])
                     ->required(),
 
-                Select::make('type_id')
-                    ->label('Type')
-                    ->relationship('type', 'name')
+                // Types : Select MULTIPLE (many-to-many)
+                Select::make('types')
+                    ->label('Types')
+                    ->relationship('types', 'name')
+                    ->multiple() // <-- IMPORTANT
                     ->searchable()
                     ->preload()
                     ->createOptionForm([
@@ -63,12 +65,13 @@ class KnifeResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->unique('types', 'name'),
-                    ])
-                    ->required(),
+                    ]),
                 
-                Select::make('material_id')
-                    ->label('Matériau')
-                    ->relationship('material', 'name')
+                // Matériaux : Select MULTIPLE (many-to-many)
+                Select::make('materials')
+                    ->label('Matériaux')
+                    ->relationship('materials', 'name')
+                    ->multiple() // <-- IMPORTANT
                     ->searchable()
                     ->preload()
                     ->createOptionForm([
@@ -77,9 +80,7 @@ class KnifeResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->unique('materials', 'name'),
-                    ])
-                    ->required(),
-                // --- FIN DES MODIFICATIONS ---
+                    ]),
 
                 Forms\Components\TextInput::make('length')
                     ->label('Longueur')
@@ -134,15 +135,15 @@ class KnifeResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('type.name')
-                    ->label('Type')
-                    ->searchable()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('types.name')
+                    ->label('Types')
+                    ->badge() // Affiche les types comme des badges
+                    ->separator(','),
 
-                Tables\Columns\TextColumn::make('material.name')
-                    ->label('Matériau')
-                    ->searchable()
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('materials.name')
+                    ->label('Matériaux')
+                    ->badge() // Affiche les matériaux comme des badges
+                    ->separator(','),
                 // --- FIN DE LA MODIFICATION ---
 
                 Tables\Columns\TextColumn::make('length')
