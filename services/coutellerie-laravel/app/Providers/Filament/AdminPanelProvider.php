@@ -24,11 +24,14 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->id('admin')
-            ->path(env('FILAMENT_PATH', 'admin')) // => /admin
-            ->login() // ✅ RAILWAY FIX: Active les routes de login sans classe spécifique
+            ->path(env('FILAMENT_PATH', 'admin'))
+            ->login()
             ->colors([
                 'primary' => Color::Amber,
             ])
+
+            ->storageUrl('/storage')
+
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
