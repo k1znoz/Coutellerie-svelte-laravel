@@ -14,13 +14,18 @@ return new class extends Migration
         Schema::create('knives', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('category');
             $table->text('description');
-            $table->string('image');
-            $table->string('type');
-            $table->string('length');
-            $table->string('material');
-            $table->decimal('price', 8, 2);
+            $table->decimal('length', 8, 2);
+            $table->decimal('price', 10, 2);
+            $table->json('images')->nullable();
+            $table->boolean('available')->default(true);
+            
+            // Relation one-to-many avec Category
+            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
+            
+            // Les relations many-to-many avec Type et Material
+            // seront gérées par les tables pivots knife_type et knife_material
+            
             $table->timestamps();
         });
     }
