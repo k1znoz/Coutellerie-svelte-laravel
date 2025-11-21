@@ -99,6 +99,7 @@ class KnifeResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('images')
                     ->label('Images')
+                    ->disk('public') // Ajout de cette ligne
                     ->circular()
                     ->stacked()
                     ->limit(3)
