@@ -1,5 +1,5 @@
 # Étape 1: Base avec PHP et Apache
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 # Mettre à jour l'environnement et installer les dépendances système et extensions PHP pour Laravel
 RUN apt-get update && apt-get install -y \
@@ -11,8 +11,9 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpq-dev \
+    libicu-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql zip exif pcntl bcmath
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql zip exif pcntl bcmath intl
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Définir le répertoire de travail
