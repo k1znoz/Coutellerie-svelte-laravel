@@ -23,7 +23,6 @@ class Knife extends Model
     ];
 
     protected $casts = [
-        'images' => 'array',
         'available' => 'boolean',
     ];
 
@@ -38,8 +37,18 @@ class Knife extends Model
     // Accesseur pour convertir les chemins d'images en URLs complètes
     public function getImagesAttribute($value): array
     {
-        $images = json_decode($value, true) ?? [];
+        // Récupérer la valeur brute (JSON string) depuis les attributs
+        $rawValue = $this->attributes['images'] ?? null;
         
+        // Si null ou vide, retourner un tableau vide
+        if (!$rawValue) {
+            return [];
+        }
+        
+        // Décoder le JSON
+        $images = json_decode($rawValue, true) ?? [];
+        
+        // Convertir les chemins relatifs en URLs absolues
         return array_map(function ($image) {
             // Si l'image est déjà une URL complète, la retourner telle quelle
             if (str_starts_with($image, 'http://') || str_starts_with($image, 'https://')) {
