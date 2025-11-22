@@ -22,7 +22,7 @@
 
 			// Mapper vers le format attendu
 			featuredImages = selectedKnives.map((knife) => ({
-				src: knife.images && knife.images.length > 0 ? knife.images[0] : '/images/placeholder.webp',
+				src: knife.images && knife.images.length > 0 ? knife.images[0] : '/images/placeholder.svg',
 				alt: `Création artisanale - ${knife.title}`,
 				id: knife.id
 			}));
@@ -74,10 +74,10 @@
 							loading="lazy"
 							on:error={(e) => {
 								// Correction TypeScript : typage explicite
-								const target = e.target as HTMLImageElement;
-								if (target) {
-									target.src = '/images/placeholder.webp';
-								}
+							const target = e.target as HTMLImageElement;
+							if (target) {
+								target.src = '/images/placeholder.svg';
+							}
 							}}
 						/>
 					</div>
