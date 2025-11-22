@@ -1,14 +1,8 @@
 <script lang="ts">
-	interface LightboxItem {
-		id: string | number;
-		title: string;
-		category: string;
-		images: string[];
-		description: string;
-	}
+	import type { Knife } from '$lib/types';
 
 	export let isOpen = false;
-	export let item: LightboxItem | null = null;
+	export let item: Knife | null = null;
 	export let onClose: () => void = () => {};
 
 	let currentImageIndex = 0;
@@ -157,8 +151,8 @@
 			</div>
 
 			<div class="lightbox-info">
-				<h3 id="lightbox-title">{item.title}</h3>
-				<p class="category">{item.category}</p>
+				<h3 id="lightbox-title">{item.title || item.name}</h3>
+				<p class="category">{item.category.name}</p>
 				<p>{item.description}</p>
 				{#if item.images.length > 1}
 					<p class="image-counter">Image {currentImageIndex + 1} sur {item.images.length}</p>

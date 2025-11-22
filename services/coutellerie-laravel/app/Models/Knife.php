@@ -26,6 +26,14 @@ class Knife extends Model
         'available' => 'boolean',
     ];
 
+    protected $appends = ['title'];
+
+    // Accesseur pour compatibilité avec le frontend (title = name)
+    public function getTitleAttribute(): ?string
+    {
+        return $this->name;
+    }
+
     // Relation one-to-many avec Category
     public function category(): BelongsTo
     {

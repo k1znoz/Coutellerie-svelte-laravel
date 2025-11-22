@@ -24,7 +24,7 @@
 		if (!knifeData || knifeData.length === 0) {
 			return ['Tous'];
 		}
-		const uniqueCategories = [...new Set(knifeData.map((knife) => knife.category))];
+		const uniqueCategories = [...new Set(knifeData.map((knife) => knife.category.name))];
 		return ['Tous', ...uniqueCategories.sort()];
 	}
 
@@ -32,13 +32,11 @@
 		if (!knifeData || knifeData.length === 0) {
 			return ['Tous'];
 		}
-		const uniqueMaterials = [
-			...new Set(
-				knifeData
-					.map((knife) => knife.material)
-					.filter((material): material is string => Boolean(material))
-			)
-		];
+		// Extraire tous les matériaux de tous les couteaux (peut avoir plusieurs matériaux par couteau)
+		const allMaterials = knifeData.flatMap((knife) =>
+			knife.materials.map((material) => material.name)
+		);
+		const uniqueMaterials = [...new Set(allMaterials)].filter(Boolean);
 		return ['Tous', ...uniqueMaterials.sort()];
 	}
 
@@ -51,19 +49,21 @@
 
 		// Filtrer par catégorie
 		if (category !== 'Tous') {
-			dataToFilter = dataToFilter.filter((knife) => knife.category === category);
+			dataToFilter = dataToFilter.filter((knife) => knife.category.name === category);
 		}
 
 		// Filtrer par matériau
 		if (material !== 'Tous') {
-			dataToFilter = dataToFilter.filter((knife) => knife.material === material);
+			dataToFilter = dataToFilter.filter((knife) =>
+				knife.materials.some((mat) => mat.name === material)
+			);
 		}
 
 		return dataToFilter.map((knife) => ({
 			id: knife.id,
-			title: knife.title,
-			category: knife.category,
-			material: knife.material,
+			title: knife.title || knife.name, // Utiliser title ou name comme fallback
+			category: knife.category.name,
+			material: knife.materials.length > 0 ? knife.materials[0].name : undefined,
 			images: knife.images || [],
 			primaryImage: knife.images && knife.images.length > 0 ? knife.images[0] : undefined
 		}));

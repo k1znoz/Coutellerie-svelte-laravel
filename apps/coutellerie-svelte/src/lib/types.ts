@@ -57,13 +57,24 @@ export interface Value {
 export interface Knife {
 	id: number;
 	title: string;
-	category: string;
+	name: string; // Le nom du couteau est maintenant dans 'name'
+	category: {
+		id: number;
+		name: string;
+	};
+	types: Array<{
+		id: number;
+		name: string;
+	}>;
+	materials: Array<{
+		id: number;
+		name: string;
+	}>;
 	images: string[];
 	description: string;
-	type?: string;
 	length?: string;
-	material?: string;
 	price?: number;
+	available?: boolean;
 }
 
 // Interfaces pour les composants Contact
