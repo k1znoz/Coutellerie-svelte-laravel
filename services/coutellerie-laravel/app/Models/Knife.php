@@ -24,6 +24,7 @@ class Knife extends Model
 
     protected $casts = [
         'available' => 'boolean',
+        'images' => 'json', // Stocker comme JSON
     ];
 
     protected $appends = ['title'];
@@ -37,32 +38,33 @@ class Knife extends Model
     // Accesseur pour convertir les chemins d'images en URLs complètes
     public function getImagesAttribute($value): array
     {
-        // Récupérer la valeur brute (JSON string) depuis les attributs
-        $rawValue = $this->attributes['images'] ?? null;
-        
-        // Si null ou vide, retourner un tableau vide
-        if (!$rawValue) {
-            return [];
+        // Le cast 'json' a déjà décodé la valeur
+        // Si c'est déjà un tableau, l'utiliser directement
+        if (is_array($value)) {
+            $images = $value;
+        } else {
+            // Sinon, essayer de décoder depuis la BDD
+            $rawValue = $this->attributes['images'] ?? null;
+            if (!$rawValue) {
+                return [];
+            }
+            $images = json_decode($rawValue, true) ?? [];
         }
         
-        // Décoder le JSON
-        $images = json_decode($rawValue, true) ?? [];
+        // Si le tableau est vide, retourner vide
+        if (empty($images)) {
+            return [];
+        }
         
         // Convertir les chemins relatifs en URLs absolues
         return array_map(function ($image) {
             // Si l'image est déjà une URL complète, la retourner telle quelle
-            if (str_starts_with($image, 'http://') || str_starts_with($image, 'https://')) {
+            if (is_string($image) && (str_starts_with($image, 'http://') || str_starts_with($image, 'https://'))) {
                 return $image;
             }
             // Générer l'URL publique avec le bon préfixe
             return config('app.url') . '/storage/' . $image;
         }, $images);
-    }
-
-    // Mutateur pour stocker les images
-    public function setImagesAttribute($value): void
-    {
-        $this->attributes['images'] = json_encode($value);
     }
 
     // Relation one-to-many avec Category
