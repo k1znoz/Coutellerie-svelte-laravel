@@ -74,10 +74,10 @@
 							loading="lazy"
 							on:error={(e) => {
 								// Correction TypeScript : typage explicite
-							const target = e.target as HTMLImageElement;
-							if (target) {
-								target.src = '/images/placeholder.svg';
-							}
+								const target = e.target as HTMLImageElement;
+								if (target) {
+									target.src = '/images/placeholder.svg';
+								}
 							}}
 						/>
 					</div>

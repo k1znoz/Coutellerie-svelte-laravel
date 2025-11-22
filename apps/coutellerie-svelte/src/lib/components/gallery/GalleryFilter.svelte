@@ -24,11 +24,13 @@
 		if (!knifeData || knifeData.length === 0) {
 			return ['Tous'];
 		}
-		const uniqueCategories = [...new Set(
-			knifeData
-				.filter((knife) => knife.category && knife.category.name)
-				.map((knife) => knife.category.name)
-		)];
+		const uniqueCategories = [
+			...new Set(
+				knifeData
+					.filter((knife) => knife.category && knife.category.name)
+					.map((knife) => knife.category.name)
+			)
+		];
 		return ['Tous', ...uniqueCategories.sort()];
 	}
 
@@ -75,8 +77,7 @@
 			id: knife.id,
 			title: knife.title || knife.name, // Utiliser title ou name comme fallback
 			category: knife.category?.name || 'Non catégorisé',
-			material:
-				knife.materials && knife.materials.length > 0 ? knife.materials[0].name : undefined,
+			material: knife.materials && knife.materials.length > 0 ? knife.materials[0].name : undefined,
 			images: knife.images || [],
 			primaryImage: knife.images && knife.images.length > 0 ? knife.images[0] : undefined
 		}));
