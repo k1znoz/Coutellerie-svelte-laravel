@@ -23,18 +23,6 @@
     </x-filament::tabs>
 
     <div class="mt-6">
-        @if ($activeTab === 'categories')
-            <div>
-                {{ $this->categoriesTable }}
-            </div>
-        @elseif ($activeTab === 'types')
-            <div>
-                {{ $this->typesTable }}
-            </div>
-        @elseif ($activeTab === 'materials')
-            <div>
-                {{ $this->materialsTable }}
-            </div>
-        @endif
+        {{ $this->table }}
     </div>
 </x-filament-panels::page>

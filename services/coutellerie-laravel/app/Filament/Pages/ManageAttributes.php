@@ -30,8 +30,17 @@ class ManageAttributes extends Page implements HasTable
     #[Url]
     public string $activeTab = 'categories';
 
-    // Table pour les catégories
-    protected function categoriesTable(Table $table): Table
+    public function table(Table $table): Table
+    {
+        return match($this->activeTab) {
+            'categories' => $this->getCategoriesTable($table),
+            'types' => $this->getTypesTable($table),
+            'materials' => $this->getMaterialsTable($table),
+            default => $this->getCategoriesTable($table),
+        };
+    }
+
+    protected function getCategoriesTable(Table $table): Table
     {
         return $table
             ->query(Category::query())
@@ -66,11 +75,11 @@ class ManageAttributes extends Page implements HasTable
                             ->maxLength(255)
                             ->unique(Category::class, 'name'),
                     ]),
-            ]);
+            ])
+            ->paginated([10, 25, 50]);
     }
 
-    // Table pour les types
-    protected function typesTable(Table $table): Table
+    protected function getTypesTable(Table $table): Table
     {
         return $table
             ->query(Type::query())
@@ -105,11 +114,11 @@ class ManageAttributes extends Page implements HasTable
                             ->maxLength(255)
                             ->unique(Type::class, 'name'),
                     ]),
-            ]);
+            ])
+            ->paginated([10, 25, 50]);
     }
 
-    // Table pour les matériaux
-    protected function materialsTable(Table $table): Table
+    protected function getMaterialsTable(Table $table): Table
     {
         return $table
             ->query(Material::query())
@@ -144,17 +153,7 @@ class ManageAttributes extends Page implements HasTable
                             ->maxLength(255)
                             ->unique(Material::class, 'name'),
                     ]),
-            ]);
-    }
-
-    // Méthode requise par l'interface HasTable
-    public function table(Table $table): Table
-    {
-        return match($this->activeTab) {
-            'categories' => $this->categoriesTable($table),
-            'types' => $this->typesTable($table),
-            'materials' => $this->materialsTable($table),
-            default => $this->categoriesTable($table),
-        };
+            ])
+            ->paginated([10, 25, 50]);
     }
 }
