@@ -73,4 +73,20 @@ class Knife extends Model
     {
         return $this->belongsToMany(Material::class);
     }
+
+    // S'assurer que les relations sont toujours présentes dans le JSON
+    public function toArray(): array
+    {
+        $array = parent::toArray();
+        
+        // S'assurer que les relations many-to-many sont des tableaux
+        if (!isset($array['types']) || !is_array($array['types'])) {
+            $array['types'] = [];
+        }
+        if (!isset($array['materials']) || !is_array($array['materials'])) {
+            $array['materials'] = [];
+        }
+        
+        return $array;
+    }
 }

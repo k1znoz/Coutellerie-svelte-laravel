@@ -12,6 +12,7 @@
 	function getPrimaryImage(item: GalleryItem): string {
 		if (item.primaryImage) return item.primaryImage;
 		if (item.images && item.images.length > 0) return item.images[0];
+		// Utiliser le SVG placeholder en attendant qu'un WebP soit ajouté
 		return '/images/placeholder.svg';
 	}
 

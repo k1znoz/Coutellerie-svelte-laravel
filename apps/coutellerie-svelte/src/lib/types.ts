@@ -58,19 +58,19 @@ export interface Knife {
 	id: number;
 	title: string;
 	name: string; // Le nom du couteau est maintenant dans 'name'
-	category: {
+	category?: {
 		id: number;
 		name: string;
 	};
-	types: Array<{
+	types?: Array<{
 		id: number;
 		name: string;
 	}>;
-	materials: Array<{
+	materials?: Array<{
 		id: number;
 		name: string;
 	}>;
-	images: string[];
+	images?: string[];
 	description: string;
 	length?: string;
 	price?: number;
