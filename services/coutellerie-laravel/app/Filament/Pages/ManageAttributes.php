@@ -2,11 +2,21 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Category;
+use App\Models\Type;
+use App\Models\Material;
 use Filament\Pages\Page;
+use Filament\Tables;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
+use Filament\Forms;
 use Livewire\Attributes\Url;
 
-class ManageAttributes extends Page
+class ManageAttributes extends Page implements HasTable
 {
+    use InteractsWithTable;
+
     protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     protected static string $view = 'filament.pages.manage-attributes';
@@ -15,19 +25,136 @@ class ManageAttributes extends Page
 
     protected static ?string $title = 'Gestion des Attributs';
 
-    // Place cette page juste après "Couteaux" dans la navigation
     protected static ?int $navigationSort = 2;
 
-    // Propriété pour gérer l'onglet actif
     #[Url]
     public string $activeTab = 'categories';
 
-    public function getViewData(): array
+    // Table pour les catégories
+    protected function categoriesTable(Table $table): Table
     {
-        return [
-            'categories' => \App\Models\Category::all(),
-            'types' => \App\Models\Type::all(),
-            'materials' => \App\Models\Material::all(),
-        ];
+        return $table
+            ->query(Category::query())
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nom')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Créé le')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make()
+                    ->form([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nom')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(Category::class, 'name', ignoreRecord: true),
+                    ]),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make()
+                    ->form([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nom')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(Category::class, 'name'),
+                    ]),
+            ]);
+    }
+
+    // Table pour les types
+    protected function typesTable(Table $table): Table
+    {
+        return $table
+            ->query(Type::query())
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nom')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Créé le')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make()
+                    ->form([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nom')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(Type::class, 'name', ignoreRecord: true),
+                    ]),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make()
+                    ->form([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nom')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(Type::class, 'name'),
+                    ]),
+            ]);
+    }
+
+    // Table pour les matériaux
+    protected function materialsTable(Table $table): Table
+    {
+        return $table
+            ->query(Material::query())
+            ->columns([
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nom')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Créé le')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make()
+                    ->form([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nom')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(Material::class, 'name', ignoreRecord: true),
+                    ]),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make()
+                    ->form([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nom')
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(Material::class, 'name'),
+                    ]),
+            ]);
+    }
+
+    // Méthode requise par l'interface HasTable
+    public function table(Table $table): Table
+    {
+        return match($this->activeTab) {
+            'categories' => $this->categoriesTable($table),
+            'types' => $this->typesTable($table),
+            'materials' => $this->materialsTable($table),
+            default => $this->categoriesTable($table),
+        };
     }
 }

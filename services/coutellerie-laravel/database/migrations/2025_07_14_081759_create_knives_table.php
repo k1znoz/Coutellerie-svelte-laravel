@@ -18,13 +18,12 @@ return new class extends Migration
             $table->decimal('length', 8, 2);
             $table->decimal('price', 10, 2);
             $table->json('images')->nullable();
-            $table->boolean('available')->default(true);
+            $table->boolean('available')->default(false);
             
-            // Relation one-to-many avec Category
+
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
             
-            // Les relations many-to-many avec Type et Material
-            // seront gérées par les tables pivots knife_type et knife_material
+
             
             $table->timestamps();
         });

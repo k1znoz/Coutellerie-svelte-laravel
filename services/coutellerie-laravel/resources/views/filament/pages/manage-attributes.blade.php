@@ -24,11 +24,17 @@
 
     <div class="mt-6">
         @if ($activeTab === 'categories')
-            @livewire(\App\Filament\Resources\CategoryResource\Pages\ListCategories::class)
+            <div>
+                {{ $this->categoriesTable }}
+            </div>
         @elseif ($activeTab === 'types')
-            @livewire(\App\Filament\Resources\TypeResource\Pages\ListTypes::class)
+            <div>
+                {{ $this->typesTable }}
+            </div>
         @elseif ($activeTab === 'materials')
-            @livewire(\App\Filament\Resources\MaterialResource\Pages\ListMaterials::class)
+            <div>
+                {{ $this->materialsTable }}
+            </div>
         @endif
     </div>
 </x-filament-panels::page>
