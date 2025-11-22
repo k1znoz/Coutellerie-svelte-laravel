@@ -58,12 +58,26 @@ class Knife extends Model
         
         // Convertir les chemins relatifs en URLs absolues
         return array_map(function ($image) {
-            // Si l'image est déjà une URL complète, la retourner telle quelle
+            // Si null ou vide, ignorer
+            if (empty($image)) {
+                return null;
+            }
+            
+            // Si l'image est déjà une URL complète (http:// ou https://), la retourner telle quelle
             if (is_string($image) && (str_starts_with($image, 'http://') || str_starts_with($image, 'https://'))) {
                 return $image;
             }
-            // Générer l'URL publique avec le bon préfixe
-            return config('app.url') . '/storage/' . $image;
+            
+            // Nettoyer les balises HTML si présentes (comme <https://...>)
+            $image = strip_tags($image);
+            
+            // Si après nettoyage c'est une URL complète, la retourner
+            if (str_starts_with($image, 'http://') || str_starts_with($image, 'https://')) {
+                return $image;
+            }
+            
+            // Sinon, c'est un chemin relatif, générer l'URL publique
+            return config('app.url') . '/storage/' . ltrim($image, '/');
         }, $images);
     }
 
