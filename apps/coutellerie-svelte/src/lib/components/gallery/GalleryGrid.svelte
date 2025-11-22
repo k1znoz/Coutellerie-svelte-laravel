@@ -12,7 +12,7 @@
 	function getPrimaryImage(item: GalleryItem): string {
 		if (item.primaryImage) return item.primaryImage;
 		if (item.images && item.images.length > 0) return item.images[0];
-		return '/images/placeholder.jpg';
+		return '/images/placeholder.svg';
 	}
 
 	export let items: GalleryItem[] = [];

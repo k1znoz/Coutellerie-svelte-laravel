@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 
 class Knife extends Model
 {
@@ -32,6 +33,27 @@ class Knife extends Model
     public function getTitleAttribute(): ?string
     {
         return $this->name;
+    }
+
+    // Accesseur pour convertir les chemins d'images en URLs complètes
+    public function getImagesAttribute($value): array
+    {
+        $images = json_decode($value, true) ?? [];
+        
+        return array_map(function ($image) {
+            // Si l'image est déjà une URL complète, la retourner telle quelle
+            if (str_starts_with($image, 'http://') || str_starts_with($image, 'https://')) {
+                return $image;
+            }
+            // Générer l'URL publique avec le bon préfixe
+            return config('app.url') . '/storage/' . $image;
+        }, $images);
+    }
+
+    // Mutateur pour stocker les images
+    public function setImagesAttribute($value): void
+    {
+        $this->attributes['images'] = json_encode($value);
     }
 
     // Relation one-to-many avec Category

@@ -1,6 +1,11 @@
 #!/bin/sh
 set -e
 
+# Supprimer le lien symbolique s'il existe déjà (pour éviter les erreurs)
+if [ -L /var/www/html/public/storage ]; then
+    rm /var/www/html/public/storage
+fi
+
 # Créer le lien symbolique pour que les images soient accessibles publiquement
 php artisan storage:link
 
