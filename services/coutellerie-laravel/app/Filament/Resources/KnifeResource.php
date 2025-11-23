@@ -98,15 +98,17 @@ class KnifeResource extends Resource
                     ->numeric()
                     ->prefix('€'),
 
-                Forms\Components\FileUpload::make('images')
+     Forms\Components\FileUpload::make('images')
                     ->label('Images')
                     ->multiple()
+                    ->image()
                     ->disk('public')
                     ->directory('knives')
-                    ->image()
+                    ->maxFiles(5)
                     ->reorderable()
-                    ->appendFiles()
-                    ->panelLayout('grid'),
+                    ->downloadable()
+                    ->previewable()
+                    ->columnSpanFull(),
 
                 Forms\Components\Toggle::make('available')
                     ->label('Disponible')

@@ -24,10 +24,10 @@ class Knife extends Model
 
     protected $casts = [
         'available' => 'boolean',
-        'images' => 'json', // Stocker comme JSON
+        'images' => 'json',
     ];
 
-    protected $appends = ['title'];
+    protected $appends = ['title', 'image_urls'];
 
     // Accesseur pour compatibilité avec le frontend (title = name)
     public function getTitleAttribute(): ?string
@@ -35,50 +35,30 @@ class Knife extends Model
         return $this->name;
     }
 
-    // Accesseur pour convertir les chemins d'images en URLs complètes
-    public function getImagesAttribute($value): array
+    // Accesseur pour générer les URLs complètes des images (sans modifier 'images')
+    public function getImageUrlsAttribute(): array
     {
-        // Le cast 'json' a déjà décodé la valeur
-        // Si c'est déjà un tableau, l'utiliser directement
-        if (is_array($value)) {
-            $images = $value;
-        } else {
-            // Sinon, essayer de décoder depuis la BDD
-            $rawValue = $this->attributes['images'] ?? null;
-            if (!$rawValue) {
-                return [];
-            }
-            $images = json_decode($rawValue, true) ?? [];
-        }
+        $images = $this->attributes['images'] ?? null;
         
-        // Si le tableau est vide, retourner vide
-        if (empty($images)) {
+        if (!$images) {
             return [];
         }
         
-        // Convertir les chemins relatifs en URLs absolues
-        return array_map(function ($image) {
-            // Si null ou vide, ignorer
-            if (empty($image)) {
+        $paths = json_decode($images, true) ?? [];
+        
+        return array_values(array_filter(array_map(function ($path) {
+            if (empty($path)) {
                 return null;
             }
             
-            // Si l'image est déjà une URL complète (http:// ou https://), la retourner telle quelle
-            if (is_string($image) && (str_starts_with($image, 'http://') || str_starts_with($image, 'https://'))) {
-                return $image;
+            // Si c'est déjà une URL complète, la retourner
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                return $path;
             }
             
-            // Nettoyer les balises HTML si présentes (comme <https://...>)
-            $image = strip_tags($image);
-            
-            // Si après nettoyage c'est une URL complète, la retourner
-            if (str_starts_with($image, 'http://') || str_starts_with($image, 'https://')) {
-                return $image;
-            }
-            
-            // Sinon, c'est un chemin relatif, générer l'URL publique
-            return config('app.url') . '/storage/' . ltrim($image, '/');
-        }, $images);
+            // Sinon construire l'URL complète
+            return config('app.url') . '/storage/' . ltrim($path, '/');
+        }, $paths)));
     }
 
     // Relation one-to-many avec Category
