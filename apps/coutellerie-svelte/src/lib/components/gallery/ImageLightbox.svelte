@@ -8,6 +8,9 @@
 	let currentImageIndex = 0;
 	let isFullscreenMode = false;
 
+	// Récupérer les images (image_urls de l'API ou images comme fallback)
+	$: imageList = item?.image_urls || item?.images || [];
+
 	// Réinitialiser l'index quand l'item change
 	$: if (item) {
 		currentImageIndex = 0;
@@ -19,14 +22,14 @@
 	}
 
 	function previousImage() {
-		if (item && item.images.length > 1) {
-			currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : item.images.length - 1;
+		if (item && imageList.length > 1) {
+			currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : imageList.length - 1;
 		}
 	}
 
 	function nextImage() {
-		if (item && item.images.length > 1) {
-			currentImageIndex = currentImageIndex < item.images.length - 1 ? currentImageIndex + 1 : 0;
+		if (item && imageList.length > 1) {
+			currentImageIndex = currentImageIndex < imageList.length - 1 ? currentImageIndex + 1 : 0;
 		}
 	}
 
@@ -104,7 +107,7 @@
 			on:click|stopPropagation={() => {}}
 		>
 			<div class="image-container">
-				<img src={item.images[currentImageIndex]} alt={item.title} />
+				<img src={imageList[currentImageIndex]} alt={item.title} />
 
 				<!-- Bouton plein écran -->
 				<button
@@ -117,7 +120,7 @@
 				</button>
 
 				<!-- Navigation arrows -->
-				{#if item.images.length > 1}
+				{#if imageList.length > 1}
 					<button
 						class="nav-button nav-prev"
 						on:click|stopPropagation={previousImage}
@@ -135,9 +138,9 @@
 				{/if}
 
 				<!-- Image thumbnails -->
-				{#if item.images.length > 1}
+				{#if imageList.length > 1}
 					<div class="thumbnail-container">
-						{#each item.images as image, index}
+						{#each imageList as image, index}
 							<button
 								class="thumbnail {currentImageIndex === index ? 'active' : ''}"
 								on:click|stopPropagation={() => selectImage(index)}
@@ -152,10 +155,10 @@
 
 			<div class="lightbox-info">
 				<h3 id="lightbox-title">{item.title || item.name}</h3>
-				<p class="category">{item.category.name}</p>
+				<p class="category">{item.category?.name}</p>
 				<p>{item.description}</p>
-				{#if item.images.length > 1}
-					<p class="image-counter">Image {currentImageIndex + 1} sur {item.images.length}</p>
+				{#if imageList.length > 1}
+					<p class="image-counter">Image {currentImageIndex + 1} sur {imageList.length}</p>
 				{/if}
 				<a href="/Contact" class="btn btn-primary">Demander un devis similaire</a>
 			</div>

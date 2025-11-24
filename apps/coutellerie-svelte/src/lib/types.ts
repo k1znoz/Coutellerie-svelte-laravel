@@ -71,6 +71,7 @@ export interface Knife {
 		name: string;
 	}>;
 	images?: string[];
+	image_urls?: string[]; // URLs complètes générées par le backend
 	description: string;
 	length?: string;
 	price?: number;
