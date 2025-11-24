@@ -102,7 +102,6 @@ class KnifeResource extends Resource
                     ->label('Images')
                     ->multiple()
                     ->image()
-                    ->disk('public')
                     ->directory('knives')
                     ->maxFiles(5)
                     ->reorderable()

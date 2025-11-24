@@ -17,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(replace: [
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class => \App\Http\Middleware\VerifyCsrfToken::class,
         ]);
+
+        // Ajouter CORS pour les fichiers storage
+        $middleware->web(append: [
+            \App\Http\Middleware\CorsForStorage::class,
+        ]);
     })
     ->withExceptions(function ($exceptions) {
         // Gestion personnalisée de l'authentification pour Filament

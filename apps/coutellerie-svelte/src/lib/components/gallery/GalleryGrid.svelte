@@ -37,7 +37,7 @@
 			aria-label="Voir le détail de {item.title}"
 		>
 			<div class="gallery-image">
-				<img src={getPrimaryImage(item)} alt={item.title} loading="lazy" />
+				<img src={getPrimaryImage(item)} alt={item.title} loading="lazy" crossorigin="anonymous" />
 				{#if item.images && item.images.length > 1}
 					<div class="image-count">
 						<span>+{item.images.length - 1}</span>

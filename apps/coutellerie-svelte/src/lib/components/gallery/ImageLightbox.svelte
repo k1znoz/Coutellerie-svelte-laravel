@@ -107,7 +107,7 @@
 			on:click|stopPropagation={() => {}}
 		>
 			<div class="image-container">
-				<img src={imageList[currentImageIndex]} alt={item.title} />
+				<img src={imageList[currentImageIndex]} alt={item.title} crossorigin="anonymous" />
 
 				<!-- Bouton plein écran -->
 				<button
@@ -146,7 +146,7 @@
 								on:click|stopPropagation={() => selectImage(index)}
 								aria-label="Voir l'image {index + 1}"
 							>
-								<img src={image} alt="{item.title} - Image {index + 1}" loading="lazy" />
+								<img src={image} alt="{item.title} - Image {index + 1}" loading="lazy" crossorigin="anonymous" />
 							</button>
 						{/each}
 					</div>
