@@ -146,7 +146,12 @@
 								on:click|stopPropagation={() => selectImage(index)}
 								aria-label="Voir l'image {index + 1}"
 							>
-								<img src={image} alt="{item.title} - Image {index + 1}" loading="lazy" crossorigin="anonymous" />
+								<img
+									src={image}
+									alt="{item.title} - Image {index + 1}"
+									loading="lazy"
+									crossorigin="anonymous"
+								/>
 							</button>
 						{/each}
 					</div>
