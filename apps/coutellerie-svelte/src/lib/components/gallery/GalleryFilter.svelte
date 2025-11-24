@@ -28,7 +28,7 @@
 			...new Set(
 				knifeData
 					.filter((knife) => knife.category && knife.category.name)
-					.map((knife) => knife.category.name)
+					.map((knife) => knife.category!.name)
 			)
 		];
 		return ['Tous', ...uniqueCategories.sort()];
@@ -80,7 +80,12 @@
 			material: knife.materials && knife.materials.length > 0 ? knife.materials[0].name : undefined,
 			images: knife.images || [],
 			image_urls: knife.image_urls || [], // URLs absolues de l'API
-			primaryImage: (knife.image_urls && knife.image_urls.length > 0 ? knife.image_urls[0] : knife.images && knife.images.length > 0 ? knife.images[0] : undefined)
+			primaryImage:
+				knife.image_urls && knife.image_urls.length > 0
+					? knife.image_urls[0]
+					: knife.images && knife.images.length > 0
+						? knife.images[0]
+						: undefined
 		}));
 	}
 
