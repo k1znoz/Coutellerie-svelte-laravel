@@ -79,7 +79,8 @@
 			category: knife.category?.name || 'Non catégorisé',
 			material: knife.materials && knife.materials.length > 0 ? knife.materials[0].name : undefined,
 			images: knife.images || [],
-			primaryImage: knife.images && knife.images.length > 0 ? knife.images[0] : undefined
+			image_urls: knife.image_urls || [], // URLs absolues de l'API
+			primaryImage: (knife.image_urls && knife.image_urls.length > 0 ? knife.image_urls[0] : knife.images && knife.images.length > 0 ? knife.images[0] : undefined)
 		}));
 	}
 

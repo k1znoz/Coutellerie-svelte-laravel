@@ -98,5 +98,6 @@ export interface GalleryItem {
 	category: string;
 	material?: string;
 	images?: string[];
+	image_urls?: string[]; // URLs absolues depuis l'API
 	primaryImage?: string; // Pour l'affichage dans la grille
 }
