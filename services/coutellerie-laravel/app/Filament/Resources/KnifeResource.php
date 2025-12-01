@@ -100,9 +100,11 @@ class KnifeResource extends Resource
 
      Forms\Components\FileUpload::make('images')
                     ->label('Images')
+                    ->disk('public')              // important
+                    ->visibility('public')        // explicite
+                    ->directory('knives')
                     ->multiple()
                     ->image()
-                    ->directory('knives')
                     ->maxFiles(5)
                     ->reorderable()
                     ->downloadable()

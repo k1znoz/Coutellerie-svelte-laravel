@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Knife;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -15,29 +16,36 @@ class KnifeController extends Controller
      */
     public function index()
     {
-        $knives = Cache::remember('knives.all', 3600, function() {
-            return Knife::all();
+        $knives = Cache::remember('knives.all', 3600, function () {
+            return Knife::with([
+                'category:id,name',
+                'types:id,name',
+                'materials:id,name',
+            ])->get();
         });
 
         // Mapper les champs pour correspondre à l'interface frontend
         $mappedKnives = $knives->map(function ($knife) {
             $images = $knife->images ?: [];
-            
-          
+
             $fullPathImages = collect($images)->map(function ($image) {
-                return url(Storage::url($image));
-            })->toArray();
+                if (is_string($image) && (str_starts_with($image, 'http://') || str_starts_with($image, 'https://'))) {
+                    return $image;
+                }
+                return Storage::disk('public')->url($image);
+            })->values()->all();
 
             return [
                 'id' => $knife->id,
                 'title' => $knife->name,
-                'category' => $knife->category,
+                'category' => optional($knife->category)->name,
+                'types' => $knife->types->pluck('name')->values()->all(),
+                'materials' => $knife->materials->pluck('name')->values()->all(),
                 'images' => $fullPathImages,
                 'description' => $knife->description,
-                'type' => $knife->type,
                 'length' => $knife->length,
-                'material' => $knife->material,
                 'price' => $knife->price,
+                'available' => (bool) $knife->available,
             ];
         });
 
@@ -74,28 +82,32 @@ class KnifeController extends Controller
      */
     public function show(string $id)
     {
-        $knife = Knife::find($id);
+        $knife = Knife::with(['category:id,name', 'types:id,name', 'materials:id,name'])->find($id);
 
         if (!$knife) {
             return response()->json(['error' => 'Couteau non trouvé'], 404);
         }
 
-       
+
         $images = $knife->images ?: [];
         $fullPathImages = collect($images)->map(function ($image) {
-            return url(Storage::url($image)); 
-        })->toArray();
+            if (is_string($image) && (str_starts_with($image, 'http://') || str_starts_with($image, 'https://'))) {
+                return $image;
+            }
+            return Storage::disk('public')->url($image);
+        })->values()->all();
 
         $mappedKnife = [
             'id' => $knife->id,
             'title' => $knife->name,
-            'category' => $knife->category,
+            'category' => optional($knife->category)->name,
+            'types' => $knife->types->pluck('name')->values()->all(),
+            'materials' => $knife->materials->pluck('name')->values()->all(),
             'images' => $fullPathImages,
             'description' => $knife->description,
-            'type' => $knife->type,
             'length' => $knife->length,
-            'material' => $knife->material,
             'price' => $knife->price,
+            'available' => (bool) $knife->available,
         ];
 
         return response()->json(['data' => $mappedKnife]);
@@ -134,11 +146,11 @@ class KnifeController extends Controller
      */
     public function categories()
     {
-        $categories = Knife::getAvailableCategories();
-        
+        $categories = Category::orderBy('name')->get(['id', 'name']);
+
         return response()->json([
             'data' => $categories,
-            'count' => count($categories)
+            'count' => $categories->count(),
         ]);
     }
 
