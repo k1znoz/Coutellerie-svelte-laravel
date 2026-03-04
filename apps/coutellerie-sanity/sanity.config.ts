@@ -7,7 +7,7 @@ export default defineConfig({
 	name: 'default',
 	title: 'Coutellerie CMS',
 
-	projectId: process.env.SANITY_STUDIO_PROJECT_ID || 'replace_me',
+	projectId: process.env.SANITY_STUDIO_PROJECT_ID || 'focn0owe',
 	dataset: process.env.SANITY_STUDIO_DATASET || 'production',
 
 	plugins: [deskTool(), visionTool()],
