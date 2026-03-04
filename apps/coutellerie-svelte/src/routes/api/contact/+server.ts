@@ -7,20 +7,21 @@ import type { RequestHandler } from './$types';
 const projectId = publicEnv.PUBLIC_SANITY_PROJECT_ID;
 const dataset = publicEnv.PUBLIC_SANITY_DATASET;
 const apiVersion = publicEnv.PUBLIC_SANITY_API_VERSION || '2025-01-01';
-const sanityApiToken = privateEnv.SANITY_API_TOKEN;
-
-const sanityWriteClient =
-	projectId && dataset && sanityApiToken
-		? createClient({
-				projectId,
-				dataset,
-				apiVersion,
-				token: sanityApiToken,
-				useCdn: false
-			})
-		: null;
 
 export const POST: RequestHandler = async ({ request, getClientAddress }) => {
+	const sanityApiToken = privateEnv.SANITY_API_TOKEN || process.env.SANITY_API_TOKEN;
+
+	const sanityWriteClient =
+		projectId && dataset && sanityApiToken
+			? createClient({
+					projectId,
+					dataset,
+					apiVersion,
+					token: sanityApiToken,
+					useCdn: false
+				})
+			: null;
+
 	if (!sanityWriteClient) {
 		const missing = [
 			!projectId ? 'PUBLIC_SANITY_PROJECT_ID' : null,
