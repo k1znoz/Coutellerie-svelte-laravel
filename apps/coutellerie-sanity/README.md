@@ -15,6 +15,8 @@ Copier `.env.example` vers `.env` puis renseigner:
 - `SANITY_STUDIO_PROJECT_ID`
 - `SANITY_STUDIO_DATASET`
 
+`SANITY_STUDIO_PROJECT_ID` doit être l'ID Sanity brut (ex: `focn0owe`), pas une URL et sans underscore.
+
 ## Lancer le Studio
 
 ```bash

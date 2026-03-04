@@ -11,6 +11,8 @@ Copier `.env.example` vers `.env` puis renseigner:
 - `PUBLIC_SANITY_API_VERSION`
 - `SANITY_API_TOKEN` (token write pour enregistrer les messages de contact via `src/routes/api/contact/+server.ts`)
 
+`PUBLIC_SANITY_PROJECT_ID` doit être l'ID Sanity brut (ex: `focn0owe`), pas une URL et sans underscore.
+
 ## Développement
 
 ```bash
