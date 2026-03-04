@@ -15,12 +15,19 @@
 		success: false,
 		message: ''
 	};
+	let isSubmitting = false;
 	const dispatch = createEventDispatcher();
 
 	async function handleSubmit() {
-		formStatus.submitted = true;
+		isSubmitting = true;
+		formStatus = {
+			submitted: false,
+			success: false,
+			message: ''
+		};
 		try {
 			const response = await sendContactMessage(formData);
+			formStatus.submitted = true;
 			if (response.success) {
 				formStatus.success = true;
 				formStatus.message =
@@ -28,12 +35,17 @@
 				formData = { name: '', email: '', subject: '', message: '' };
 				dispatch('success');
 			} else {
-				throw new Error(response.error || "Erreur lors de l'envoi du message");
+				formStatus.success = false;
+				formStatus.message =
+					response.error || "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer.";
 			}
 		} catch {
+			formStatus.submitted = true;
 			formStatus.success = false;
 			formStatus.message =
 				"Une erreur est survenue lors de l'envoi du message. Veuillez réessayer.";
+		} finally {
+			isSubmitting = false;
 		}
 	}
 </script>
@@ -47,6 +59,12 @@
 		</div>
 	{:else}
 		<form on:submit|preventDefault={handleSubmit}>
+			{#if formStatus.submitted && !formStatus.success && formStatus.message}
+				<div class="error-message">
+					<p>{formStatus.message}</p>
+				</div>
+			{/if}
+
 			<div class="form-group">
 				<label for="name">Nom complet <span>*</span></label>
 				<input type="text" id="name" bind:value={formData.name} required placeholder="Votre nom" />
@@ -84,9 +102,9 @@
 			<button
 				type="submit"
 				class="btn btn-primary"
-				disabled={formStatus.submitted && !formStatus.success}
+				disabled={isSubmitting}
 			>
-				{#if formStatus.submitted && !formStatus.success}
+				{#if isSubmitting}
 					<i class="fas fa-spinner fa-spin"></i> Envoi en cours...
 				{:else}
 					Envoyer le message
@@ -165,6 +183,14 @@
 		padding: 2rem;
 		border-radius: 0.25rem;
 		text-align: center;
+	}
+
+	.error-message {
+		background-color: #f8d7da;
+		color: #721c24;
+		padding: 1rem;
+		margin-bottom: 1rem;
+		border-radius: 0.25rem;
 	}
 
 	.success-message i {

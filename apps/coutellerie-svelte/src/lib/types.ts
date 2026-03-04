@@ -55,7 +55,7 @@ export interface Value {
 
 // Interface pour les objets knife (couteaux)
 export interface Knife {
-	id: number;
+	id: string | number;
 	title: string;
 	category: string;
 	images: string[];

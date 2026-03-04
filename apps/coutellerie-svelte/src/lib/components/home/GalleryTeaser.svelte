@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { getAllKnives } from '$lib/services/api'; // Utiliser l'API Laravel
+	import { getAllKnives } from '$lib/services/api';
 	import type { Knife } from '$lib/types';
 
-	let featuredImages: { src: string; alt: string; id: number }[] = [];
+	let featuredImages: { src: string; alt: string; id: string | number }[] = [];
 	let loading = true;
 
 	/**
@@ -34,7 +34,7 @@
 		}
 	}
 
-	function handleImageClick(id: number) {
+	function handleImageClick(id: string | number) {
 		goto('/Gallery');
 	}
 

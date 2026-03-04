@@ -1,38 +1,30 @@
-# sv
+# Coutellerie Svelte
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Frontend SvelteKit de la coutellerie, connecté à Sanity pour la galerie et les messages de contact.
 
-## Creating a project
+## Variables d'environnement
 
-If you're seeing this, you've probably already done this step. Congrats!
+Copier `.env.example` vers `.env` puis renseigner:
 
-```bash
-# create a new project in the current directory
-npx sv create
+- `PUBLIC_SANITY_PROJECT_ID`
+- `PUBLIC_SANITY_DATASET`
+- `PUBLIC_SANITY_API_VERSION`
+- `SANITY_API_TOKEN` (token write pour enregistrer les messages de contact via `src/routes/api/contact/+server.ts`)
 
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Développement
 
 ```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
-
-To create a production version of your app:
+## Build
 
 ```bash
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+## Notes d'architecture
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+- Les couteaux de la galerie sont lus directement depuis Sanity via `src/lib/services/api.ts`.
+- Les messages de contact sont enregistrés via un endpoint SvelteKit (`/api/contact`) puis créés dans Sanity.
