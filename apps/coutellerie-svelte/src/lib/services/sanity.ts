@@ -1,16 +1,11 @@
 import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import { env } from '$env/dynamic/public';
+import { getSanityDataset, getSanityProjectId } from '$lib/utils/sanityEnv';
 
-const projectId = env.PUBLIC_SANITY_PROJECT_ID;
-const dataset = env.PUBLIC_SANITY_DATASET;
+const projectId = getSanityProjectId(env.PUBLIC_SANITY_PROJECT_ID);
+const dataset = getSanityDataset(env.PUBLIC_SANITY_DATASET);
 const apiVersion = env.PUBLIC_SANITY_API_VERSION || '2025-01-01';
-
-if (!projectId || !dataset) {
-	throw new Error(
-		'Missing Sanity configuration. Define PUBLIC_SANITY_PROJECT_ID and PUBLIC_SANITY_DATASET in your .env file.'
-	);
-}
 
 export const sanityClient = createClient({
 	projectId,
